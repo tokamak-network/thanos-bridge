@@ -1,4 +1,3 @@
-import { useModal } from "@/contexts/modalContext";
 import React from "react";
 import {
   Modal,
@@ -13,9 +12,8 @@ import { Text } from "@chakra-ui/react";
 import { Button } from "../ui/button";
 
 export const WalletOptionModal: React.FC = () => {
-  const { isWalletModalOpen, closeWalletModal } = useModal();
   return (
-    <Modal isOpen={isWalletModalOpen} onClose={closeWalletModal} isCentered>
+    <Modal isOpen={false} onClose={() => {}} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Modal Title</ModalHeader>
@@ -27,7 +25,7 @@ export const WalletOptionModal: React.FC = () => {
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={closeWalletModal}>
+          <Button colorScheme="blue" mr={3} onClick={() => {}}>
             Close
           </Button>
           <Button variant="ghost">Secondary Action</Button>
