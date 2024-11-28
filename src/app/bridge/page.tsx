@@ -1,6 +1,9 @@
 "use client";
+
+import { Flex } from "@chakra-ui/react";
+
 const BridgePage: React.FC = () => {
-  return <div />;
+  return <Flex></Flex>;
 };
 
 export default BridgePage;

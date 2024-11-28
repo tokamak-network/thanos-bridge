@@ -1,7 +1,8 @@
 import { Providers } from "./providers";
 import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
-// import { GNBComponent } from "@/components/layout/GNB";
+import { GNBComponent } from "@/components/layout/GNB";
+import { WalletOptionModal } from "@/components/wallet-connect/WalletOptionModal";
 
 export default function RootLayout({
   children,
@@ -15,8 +16,9 @@ export default function RootLayout({
       </head>
       <body>
         <Providers>
-          {/* <GNBComponent /> */}
+          <GNBComponent />
           {children}
+          <WalletOptionModal />
           <Footer />
         </Providers>
       </body>

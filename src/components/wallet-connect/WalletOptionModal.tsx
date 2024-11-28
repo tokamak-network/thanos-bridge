@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Modal,
@@ -10,10 +12,13 @@ import {
 } from "@chakra-ui/modal";
 import { Text } from "@chakra-ui/react";
 import { Button } from "../ui/button";
+import { useAtom } from "jotai";
+import { walletConnectModalOpenedStatus } from "@/jotai/wallet-connect";
 
 export const WalletOptionModal: React.FC = () => {
+  const [isOpen, setIsOpen] = useAtom(walletConnectModalOpenedStatus);
   return (
-    <Modal isOpen={false} onClose={() => {}} isCentered>
+    <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Modal Title</ModalHeader>
@@ -25,7 +30,7 @@ export const WalletOptionModal: React.FC = () => {
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={() => {}}>
+          <Button colorScheme="blue" mr={3} onClick={() => setIsOpen(false)}>
             Close
           </Button>
           <Button variant="ghost">Secondary Action</Button>
