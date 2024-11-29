@@ -1,10 +1,10 @@
-import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 export const useWalletConnect = () => {
   const { address, isConnected, chain, chainId } = useAccount();
   const { disconnect } = useDisconnect();
   const { connectors, connect } = useConnect();
-  const { switchChain, switchChainAsync } = useSwitchChain();
+
   return {
     address,
     isConnected,
@@ -13,7 +13,5 @@ export const useWalletConnect = () => {
     disconnect,
     connect,
     connectors,
-    switchChain,
-    switchChainAsync,
   };
 };

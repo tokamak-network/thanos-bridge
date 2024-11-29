@@ -9,7 +9,7 @@ import L2NetworkIcon from "@/assets/icons/network/l2-network.svg";
 import Image from "next/image";
 import { ChainLayerEnum } from "@/types/network";
 import { getChainLayer } from "@/utils/network";
-import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
+import { useNetwork } from "@/hooks/network/useNetwork";
 
 interface INetworkSwitcherProps {
   onClick: () => void;
@@ -19,7 +19,7 @@ export const NetworkSwitcher: React.FC<INetworkSwitcherProps> = ({
   onClick,
 }) => {
   const chains = [l1Chain, l2Chain];
-  const { switchChainAsync } = useWalletConnect();
+  const { switchChainAsync } = useNetwork();
   const handleNetworkClick = async (chainId: number) => {
     if (switchChainAsync) {
       await switchChainAsync({ chainId });
