@@ -30,7 +30,7 @@ export const Account = () => {
       py={"11px"}
       bgColor={"#101217"}
       borderRadius={"8px"}
-      border={"1px solid #555A64"}
+      border={"1px solid #25282F"}
       fontWeight={500}
       fontSize={"16px"}
       _hover={{ bgColor: "#25282F" }}
