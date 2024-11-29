@@ -1,11 +1,11 @@
 "use client";
 
-import * as React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider } from "wagmi";
 import { config } from "@/config/wagmi.config";
-import { UIProvider } from "@/lib/UIProvider";
 import { JotaiProvider } from "@/lib/JotaiProvider";
+import { UIProvider } from "@/lib/UIProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as React from "react";
+import { WagmiProvider } from "wagmi";
 
 const queryClient = new QueryClient();
 

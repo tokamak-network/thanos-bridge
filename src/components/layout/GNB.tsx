@@ -1,20 +1,21 @@
 "use client";
 
-import { Flex, Text } from "@chakra-ui/react";
-import { useRouter, usePathname } from "next/navigation";
 import { Account } from "@/components/wallet-connect/Account";
+import { Flex, Text } from "@chakra-ui/react";
+import { usePathname, useRouter } from "next/navigation";
+import { ConnectedNetwork } from "../network/ConnectedNetwork";
 export const GNBComponent = () => {
   const router = useRouter();
   const pathName = usePathname();
   return (
     <Flex
       height={"80px"}
-      justifyContent={"space-between"}
+      position={"relative"}
+      justifyContent={"center"}
       alignItems={"center"}
       px={"32px"}
       py={"20px"}
     >
-      <Flex></Flex>
       <Flex gap={"48px"}>
         <Text
           fontSize={"16px"}
@@ -37,7 +38,8 @@ export const GNBComponent = () => {
           Account
         </Text>
       </Flex>
-      <Flex>
+      <Flex gap={"12px"} position={"absolute"} right={"32px"}>
+        <ConnectedNetwork />
         <Account />
       </Flex>
     </Flex>

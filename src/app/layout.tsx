@@ -1,8 +1,9 @@
-import { Providers } from "./providers";
-import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
 import { GNBComponent } from "@/components/layout/GNB";
-import { WalletOptionModal } from "@/components/wallet-connect/WalletOptionModal";
+import { Modal } from "@/components/Modal";
+import { Flex } from "@chakra-ui/react";
+import "./globals.css";
+import { Providers } from "./providers";
 
 export default function RootLayout({
   children,
@@ -16,10 +17,12 @@ export default function RootLayout({
       </head>
       <body>
         <Providers>
-          <GNBComponent />
-          {children}
-          <WalletOptionModal />
-          <Footer />
+          <Flex flexDir={"column"}>
+            <GNBComponent />
+            {children}
+            <Modal />
+            <Footer />
+          </Flex>
         </Providers>
       </body>
     </html>

@@ -1,25 +1,33 @@
 "use client";
 
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
-import { Button } from "../ui/button";
-import { useEnsName } from "wagmi";
-import { useAtom } from "jotai";
 import { walletConnectModalOpenedStatus } from "@/jotai/wallet-connect";
+import { trimAddress } from "@/utils/trimAddress";
+import { useAtom } from "jotai";
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
 
 export const Account = () => {
-  const { address, isConnected, disconnect, connect, connectors } =
-    useWalletConnect();
-  const { data: ensName } = useEnsName({ address });
-  const [isOpen, setIsOpen] = useAtom(walletConnectModalOpenedStatus);
+  const { address, isConnected } = useWalletConnect();
+  const [, setIsOpen] = useAtom(walletConnectModalOpenedStatus);
+  const [buttonText, setButtonText] = useState("Connect Wallet");
 
   const handleWalletConnect = () => {
-    if (isConnected) disconnect();
-    setIsOpen(true);
+    if (!isConnected) setIsOpen(true);
   };
+
+  useEffect(() => {
+    if (!isConnected) {
+      setButtonText("Connect Wallet");
+    } else {
+      setButtonText(trimAddress({ address, firstChar: 6, lastChar: 4 }));
+    }
+  }, [address, isConnected]);
+
   return (
     <Button
       px={"12px"}
-      py={"8px"}
+      py={"11px"}
       bgColor={"#101217"}
       borderRadius={"8px"}
       border={"1px solid #555A64"}
@@ -28,7 +36,7 @@ export const Account = () => {
       _hover={{ bgColor: "#25282F" }}
       onClick={handleWalletConnect}
     >
-      {isConnected ? ensName : "Connect Wallet"}
+      {buttonText}
     </Button>
   );
 };
