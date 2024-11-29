@@ -2,32 +2,25 @@
 
 import { Flex } from "@chakra-ui/react";
 import { l1Chain, l2Chain } from "@/config/network";
-import { Button } from "../ui/button";
 import { Chain } from "wagmi/chains";
 import L1NetworkIcon from "@/assets/icons/network/l1-network.svg";
 import L2NetworkIcon from "@/assets/icons/network/l2-network.svg";
 import Image from "next/image";
 import { ChainLayerEnum } from "@/types/network";
 import { getChainLayer } from "@/utils/network";
-import { useNetwork } from "@/hooks/network/useNetwork";
+import { MenuContent, MenuItem } from "../ui/menu";
 
-interface INetworkSwitcherProps {
-  onClick: () => void;
+interface INetworkListComponentProps {
+  onSelectNetwork: (chainId: number) => Promise<void>;
 }
 
-export const NetworkSwitcher: React.FC<INetworkSwitcherProps> = ({
-  onClick,
+export const NetworkListComponent: React.FC<INetworkListComponentProps> = ({
+  onSelectNetwork,
 }) => {
   const chains = [l1Chain, l2Chain];
-  const { switchChainAsync } = useNetwork();
-  const handleNetworkClick = async (chainId: number) => {
-    if (switchChainAsync) {
-      await switchChainAsync({ chainId });
-    }
-    onClick();
-  };
   return (
-    <Flex
+    <MenuContent
+      display={"flex"}
       flexDir={"column"}
       py={"8px"}
       justifyContent={"flex-start"}
@@ -39,29 +32,34 @@ export const NetworkSwitcher: React.FC<INetworkSwitcherProps> = ({
       border={"1px solid #25282F"}
     >
       {chains.map((chain: Chain) => (
-        <Button
+        <MenuItem
           key={chain.id}
+          onClick={async () => {
+            await onSelectNetwork(chain.id);
+          }}
+          value={chain.name}
           width={"100%"}
           px={"12px"}
-          py={"4px"}
+          py={"5.5px"}
           fontSize={"14px"}
           fontWeight={500}
           bgColor={"transparent"}
-          _hover={{ bgColor: "#383736" }}
+          _hover={{ bgColor: "#1D1F25" }}
           justifyContent={"flex-start"}
-          onClick={() => handleNetworkClick(chain.id)}
+          color={"#FFFFFF"}
+          cursor={"pointer"}
         >
           <Flex gap={"8px"} alignItems={"center"}>
             {getChainLayer(chain.id) === ChainLayerEnum.L1 && (
-              <Image src={L1NetworkIcon} alt="l1" width={24} height={24} />
+              <Image src={L1NetworkIcon} alt="l1" width={20} height={20} />
             )}
             {getChainLayer(chain.id) === ChainLayerEnum.L2 && (
-              <Image src={L2NetworkIcon} alt="l2" width={24} height={24} />
+              <Image src={L2NetworkIcon} alt="l2" width={20} height={20} />
             )}
             {chain.name}
           </Flex>
-        </Button>
+        </MenuItem>
       ))}
-    </Flex>
+    </MenuContent>
   );
 };
