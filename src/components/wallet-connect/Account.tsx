@@ -27,12 +27,13 @@ export const Account = () => {
   return (
     <Button
       px={"12px"}
-      py={"11px"}
+      py={"8px"}
       bgColor={"#101217"}
       borderRadius={"8px"}
       border={"1px solid #25282F"}
       fontWeight={500}
       fontSize={"16px"}
+      lineHeight={"normal"}
       _hover={{ bgColor: "#25282F" }}
       onClick={handleWalletConnect}
     >
