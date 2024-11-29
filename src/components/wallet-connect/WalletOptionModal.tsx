@@ -25,7 +25,7 @@ export const WalletOptionModal: React.FC = () => {
     if (isConnected) {
       setIsOpen(false);
     }
-  }, [isConnected]);
+  }, [isConnected, setIsOpen]);
 
   return (
     <DialogRoot
