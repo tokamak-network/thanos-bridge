@@ -33,7 +33,7 @@ export const Account = () => {
       border={"1px solid #25282F"}
       fontWeight={500}
       fontSize={"16px"}
-      lineHeight={"normal"}
+      lineHeight={"24px"}
       _hover={{ bgColor: "#25282F" }}
       onClick={handleWalletConnect}
     >

@@ -34,6 +34,7 @@ const ConnectedNetworkComponent: React.FC<IConnectedNetworkProps> = ({
       fontWeight={500}
       fontSize={"16px"}
       onClick={onClick}
+      lineHeight={"24px"}
     >
       <Flex gap={"8px"} alignItems={"center"}>
         {chainLayer === ChainLayerEnum.L1 && (
