@@ -5,6 +5,7 @@ import { DepositButtonComponent } from "./DepositButton";
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
 import { FromToNetworkComponent } from "./FromToNetwork";
 import { jotaiBridgeTransactionInfo } from "@/jotai/bridge";
+import { ToAddressComponent } from "./ToAddressComponent";
 
 export const DepositWithdrawComponent: React.FC = () => {
   const [transaction] = useAtom(jotaiBridgeTransactionInfo);
@@ -16,8 +17,11 @@ export const DepositWithdrawComponent: React.FC = () => {
         borderRadius={"22px"}
         border={"1px solid #25282F"}
         p={"24px"}
+        gap={"16px"}
+        flexDir={"column"}
       >
         <FromToNetworkComponent />
+        <ToAddressComponent />
       </Flex>
       {transaction.mode === BridgeModeEnum.DEPOSIT && isConnected && (
         <DepositButtonComponent />

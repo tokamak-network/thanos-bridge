@@ -2,7 +2,7 @@
 
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
 import { walletConnectModalOpenedStatus } from "@/jotai/wallet-connect";
-import { trimAddress } from "@/utils/trimAddress";
+import { trimAddress } from "@/utils/address";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
