@@ -2,7 +2,7 @@
 
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
 import { walletConnectModalOpenedStatus } from "@/jotai/wallet-connect";
-import { trimAddress } from "@/utils/trimAddress";
+import { trimAddress } from "@/utils/address";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
@@ -33,7 +33,7 @@ export const Account = () => {
       border={"1px solid #25282F"}
       fontWeight={500}
       fontSize={"16px"}
-      lineHeight={"normal"}
+      lineHeight={"24px"}
       _hover={{ bgColor: "#25282F" }}
       onClick={handleWalletConnect}
     >

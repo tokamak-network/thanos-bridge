@@ -12,3 +12,11 @@ export function trimAddress(args: {
   const lastCharAt = address.substring(address.length - (lastChar ?? 4));
   return `${firstChatAt}${dots ?? "..."}${lastCharAt}`;
 }
+
+export const isValidEthereumAddress = (address: string) => {
+  if (!address) return false;
+
+  const regex = /^(0x)?[0-9a-fA-F]{40}$/;
+
+  return regex.test(address);
+};

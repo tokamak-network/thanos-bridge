@@ -1,4 +1,18 @@
-import { BridgeEnum } from "@/types/bridge";
+import { l1Chain, l2Chain } from "@/config/network";
+import {
+  BridgeModeEnum,
+  BridgeTokenEnum,
+  BridgeTransactionInfo,
+} from "@/types/bridge";
 import { atom } from "jotai";
 
-export const bridgeStatus = atom<BridgeEnum>(BridgeEnum.DEPOSIT);
+export const jotaiBridgeTransactionInfo = atom<BridgeTransactionInfo>({
+  mode: BridgeModeEnum.DEPOSIT,
+  fromChain: l1Chain,
+  toChain: l2Chain,
+  fromAddress: "",
+  toAddress: "",
+  amount: BigInt(0),
+  formatted: "",
+  bridgeTokenType: BridgeTokenEnum.ETH,
+});
