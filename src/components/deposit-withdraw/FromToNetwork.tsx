@@ -48,6 +48,7 @@ export const FromToNetworkComponent: React.FC = () => {
               py={"10px"}
               borderRadius={"6px"}
               border={"1px solid #25282F"}
+              _hover={{ bgColor: "#25282F" }}
             >
               <Flex
                 alignItems={"center"}
@@ -122,6 +123,7 @@ export const FromToNetworkComponent: React.FC = () => {
               py={"10px"}
               borderRadius={"6px"}
               border={"1px solid #25282F"}
+              _hover={{ bgColor: "#25282F" }}
             >
               <Flex
                 alignItems={"center"}

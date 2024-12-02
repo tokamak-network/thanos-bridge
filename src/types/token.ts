@@ -9,6 +9,10 @@ export interface Token {
   bridgedTokenSymbol?: string;
 }
 
+export interface TokenWithBalance extends Token {
+  balance: TokenBalance;
+}
+
 export interface TokenBalance {
   decimals: number;
   formatted: string;

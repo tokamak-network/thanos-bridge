@@ -19,8 +19,9 @@ export const TokenSelectionComponent: React.FC<
       alignItems={"center"}
       gap={"8px"}
       onClick={onClick}
+      _hover={{ bgColor: "#25282F" }}
     >
-      <TokenSymbolComponent tokenSymbol="ETH" width={25} height={25} />
+      <TokenSymbolComponent tokenSymbol={tokenSymbol} width={25} height={25} />
       <Text fontSize={"20px"} fontWeight={500} lineHeight={"normal"}>
         {tokenSymbol}
       </Text>

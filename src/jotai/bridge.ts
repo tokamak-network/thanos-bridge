@@ -16,3 +16,7 @@ export const jotaiBridgeTransactionInfo = atom<BridgeTransactionInfo>({
   formatted: "",
   bridgeTokenType: BridgeTokenEnum.ETH,
 });
+
+export const jotaiTokenSelectModalOpen = atom<boolean>(false);
+
+export const jotaiIsInsufficient = atom<boolean>(false);

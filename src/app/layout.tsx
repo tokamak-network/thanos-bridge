@@ -1,9 +1,9 @@
 import { Footer } from "@/components/layout/Footer";
 import { GNBComponent } from "@/components/layout/GNB";
-import { Modal } from "@/components/Modal";
 import { Flex } from "@chakra-ui/react";
 import "./globals.css";
 import { Providers } from "./providers";
+import { Modal } from "@/components/modals/Modal";
 
 export default function RootLayout({
   children,

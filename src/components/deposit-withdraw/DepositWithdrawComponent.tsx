@@ -5,7 +5,10 @@ import { useAtom } from "jotai";
 import { DepositButtonComponent } from "./DepositButton";
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
 import { FromToNetworkComponent } from "./FromToNetwork";
-import { jotaiBridgeTransactionInfo } from "@/jotai/bridge";
+import {
+  jotaiBridgeTransactionInfo,
+  jotaiIsInsufficient,
+} from "@/jotai/bridge";
 import { ToAddressComponent } from "./ToAddressComponent";
 import { TokenInputComponent } from "./TokenInputComponent";
 import { getParsedAmount } from "@/utils/token-balance";
@@ -17,6 +20,7 @@ export const DepositWithdrawComponent: React.FC = () => {
   const { isConnected } = useWalletConnect();
   const isAvailableToDeposit =
     transaction.formatted !== "" && getParsedAmount(transaction.formatted, 18);
+  const [isInsufficient] = useAtom(jotaiIsInsufficient);
   return (
     <Flex flexDir={"column"} gap={"32px"} width={"100%"}>
       <Flex
@@ -29,7 +33,7 @@ export const DepositWithdrawComponent: React.FC = () => {
       >
         <FromToNetworkComponent />
         <TokenInputComponent />
-        {transaction.amount && (
+        {transaction.amount && isConnected && (
           <ReceiveAmountComponent
             amount={transaction.formatted}
             tokenSymbol={getBridgeToken(transaction)?.symbol ?? ""}
@@ -38,7 +42,10 @@ export const DepositWithdrawComponent: React.FC = () => {
         <ToAddressComponent />
       </Flex>
       {transaction.mode === BridgeModeEnum.DEPOSIT && isConnected && (
-        <DepositButtonComponent disabled={!isAvailableToDeposit} />
+        <DepositButtonComponent
+          disabled={!isAvailableToDeposit || isInsufficient}
+          content={isInsufficient ? "Insufficient balance" : "Deposit"}
+        />
       )}
     </Flex>
   );
