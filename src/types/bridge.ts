@@ -1,5 +1,5 @@
-import { BigNumberish } from "ethers";
 import { Chain } from "wagmi/chains";
+import { Token } from "./token";
 export enum BridgeModeEnum {
   DEPOSIT = "deposit",
   WITHDRAW = "withdraw",
@@ -17,9 +17,10 @@ export interface BridgeTransactionInfo {
   fromChain: Chain;
   toChain: Chain;
   fromAddress: string;
-  toAddress?: string;
-  amount: BigNumberish;
+  toAddress: string;
+  amount: bigint;
+  formatted: string;
   bridgeTokenType: BridgeTokenEnum;
-  l1TokenAddress?: string;
-  l2TokenAddress?: string;
+  l1Token?: Token;
+  l2Token?: Token;
 }

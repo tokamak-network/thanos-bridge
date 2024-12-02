@@ -3,33 +3,14 @@
 import { DepositWithdrawComponent } from "@/components/deposit-withdraw/DepositWithdrawComponent";
 import { DepositWithdrawTabComponent } from "@/components/deposit-withdraw/DepositWithdrawTab";
 import { WalletConnectButtonComponent } from "@/components/wallet-connect/WalletConnectButton";
-import { l1Chain, l2Chain } from "@/config/network";
+import { useDepositWithdrawInitiate } from "@/hooks/bridge/useDepositWithdrawInitiate";
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
-import { jotaiBridgeTransactionInfo } from "@/jotai/bridge";
-import { BridgeModeEnum } from "@/types/bridge";
 import { Flex } from "@chakra-ui/react";
-import { useAtom } from "jotai";
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
 
 const BridgePageContent: React.FC = () => {
   const { isConnected } = useWalletConnect();
-  const [transaction, setTransaction] = useAtom(jotaiBridgeTransactionInfo);
-  useEffect(() => {
-    if (transaction.mode === BridgeModeEnum.DEPOSIT) {
-      setTransaction((prev) => ({
-        ...prev,
-        fromChain: l1Chain,
-        toChain: l2Chain,
-      }));
-    } else {
-      setTransaction((prev) => ({
-        ...prev,
-        fromChain: l2Chain,
-        toChain: l1Chain,
-      }));
-    }
-  }, [transaction.mode, setTransaction]);
+  const {} = useDepositWithdrawInitiate();
   return (
     <Flex w={"100%"} justifyContent={"center"}>
       <Flex

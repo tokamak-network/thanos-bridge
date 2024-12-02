@@ -1,4 +1,4 @@
-import { BridgeModeEnum } from "@/types/bridge";
+import { BridgeModeEnum, BridgeTransactionInfo } from "@/types/bridge";
 import { Flex } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { Button } from "../ui/button";
@@ -19,13 +19,16 @@ export const DepositWithdrawTabComponent: React.FC = () => {
     } else {
       await switchToL2();
     }
-    setTransaction((prev) => ({ ...prev, mode: status }));
+    setTransaction((prev: BridgeTransactionInfo) => ({
+      ...prev,
+      mode: status,
+    }));
   };
 
   useEffect(() => {
     if (!chain) return;
     const chainLayer = getChainLayer(chain.id);
-    setTransaction((prev) => ({
+    setTransaction((prev: BridgeTransactionInfo) => ({
       ...prev,
       mode:
         chainLayer === ChainLayerEnum.L1

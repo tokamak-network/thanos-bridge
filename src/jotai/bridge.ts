@@ -11,6 +11,8 @@ export const jotaiBridgeTransactionInfo = atom<BridgeTransactionInfo>({
   fromChain: l1Chain,
   toChain: l2Chain,
   fromAddress: "",
-  amount: 0,
+  toAddress: "",
+  amount: BigInt(0),
+  formatted: "",
   bridgeTokenType: BridgeTokenEnum.ETH,
 });
