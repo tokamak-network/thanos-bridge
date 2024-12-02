@@ -79,6 +79,7 @@ export const TokenInputComponent: React.FC = () => {
             placeholder="0"
             value={transaction.formatted}
             border={"1px solid transparent"}
+            _focus={{ outline: "none" }}
             onChange={handleChange}
           />
           <TokenSelectionComponent

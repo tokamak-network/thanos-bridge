@@ -18,7 +18,7 @@ export const ToAddressComponent: React.FC = () => {
   };
   const isValid = useMemo(
     () => isValidEthereumAddress(transaction.toAddress ?? ""),
-    [transaction.toAddress, isValidEthereumAddress]
+    [transaction.toAddress]
   );
   const isConnectedAddress = useMemo(() => {
     return isConnected && address === transaction.toAddress;

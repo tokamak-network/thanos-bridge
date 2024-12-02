@@ -1,4 +1,4 @@
-import { ButtonProps, Flex, Text } from "@chakra-ui/react";
+import { ButtonProps, Text } from "@chakra-ui/react";
 import { Button } from "../ui/button";
 import { ArrowDownIconComponent } from "../icons/ArrowDown";
 import { TokenSymbolComponent } from "../icons/TokenSymbol";

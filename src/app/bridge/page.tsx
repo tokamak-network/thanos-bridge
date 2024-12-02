@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 
 const BridgePageContent: React.FC = () => {
   const { isConnected } = useWalletConnect();
-  const {} = useDepositWithdrawInitiate();
+  useDepositWithdrawInitiate();
   return (
     <Flex w={"100%"} justifyContent={"center"}>
       <Flex
