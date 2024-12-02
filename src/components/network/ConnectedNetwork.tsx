@@ -13,16 +13,17 @@ import { ChainLayerEnum } from "@/types/network";
 import { MenuRoot, MenuTrigger } from "@/components/ui/menu";
 import { NetworkListComponent } from "./NetworkList";
 import { useNetwork } from "@/hooks/network/useNetwork";
+import { l1Chain } from "@/config/network";
 
 const ConnectedNetworkComponent: React.FC = () => {
-  const { chain } = useWalletConnect();
+  const { chain, isConnected } = useWalletConnect();
   const chainLayer = useMemo(() => {
-    if (!chain) return ChainLayerEnum.UNKNOWN;
+    if (!chain) return ChainLayerEnum.L1;
     return getChainLayer(chain.id);
   }, [chain]);
   const { switchChain } = useNetwork();
   const handleNetworkSelect = async (chainId: number) => {
-    await switchChain(chainId);
+    if (isConnected) await switchChain(chainId);
   };
   return (
     <MenuRoot>
@@ -53,7 +54,7 @@ const ConnectedNetworkComponent: React.FC = () => {
                 height={24}
               />
             )}
-            {chain?.name}
+            {chain?.name ?? l1Chain.name}
           </Flex>
         </Button>
       </MenuTrigger>

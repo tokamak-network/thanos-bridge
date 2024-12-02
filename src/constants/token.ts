@@ -24,7 +24,9 @@ export const supportedTokens: Token[] = [
     name: "Native Token",
     symbol: "NativeToken",
     decimals: 18,
-    address: (process.env.NATIVE_TOKEN_L1_ADDRESS as `0x${string}`) || "0x",
+    address:
+      (process.env.NEXT_PUBLIC_NATIVE_TOKEN_L1_ADDRESS as `0x${string}`) ||
+      "0x",
     bridgedTokenSymbol: "native",
   },
   {

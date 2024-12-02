@@ -29,7 +29,6 @@ export const WalletOptionModal: React.FC = () => {
 
   return (
     <DialogRoot
-      key="center"
       open={isOpen}
       placement="center"
       onEscapeKeyDown={() => setIsOpen(false)}
