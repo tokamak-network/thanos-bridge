@@ -58,6 +58,6 @@ export const useDepositWithdrawInitiate = () => {
       transaction.l2Token
     );
     setTransaction((prev) => ({ ...prev, bridgeTokenType }));
-  }, [transaction.l1Token, transaction.l2Token]);
+  }, [transaction.l1Token, transaction.l2Token, setTransaction]);
   return { transaction };
 };

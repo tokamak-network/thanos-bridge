@@ -18,6 +18,6 @@ export const useTokenBalance = (transaction: BridgeTransactionInfo) => {
     ).then((balance) => {
       setBalance(balance);
     });
-  }, [transaction.mode, transaction.l1Token, transaction.l2Token]);
+  }, [transaction, setBalance]);
   return { balance };
 };
