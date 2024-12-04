@@ -14,6 +14,8 @@ import { TokenInputComponent } from "./TokenInputComponent";
 import { getParsedAmount } from "@/utils/token-balance";
 import { ReceiveAmountComponent } from "./ReceiveAmountComponent";
 import { getBridgeToken } from "@/utils/bridge";
+import { useState } from "react";
+import { DepositConfirmModal } from "./confirm-modal/DepositConfirmModal";
 
 export const DepositWithdrawComponent: React.FC = () => {
   const [transaction] = useAtom(jotaiBridgeTransactionInfo);
@@ -21,6 +23,7 @@ export const DepositWithdrawComponent: React.FC = () => {
   const isAvailableToDeposit =
     transaction.formatted !== "" && getParsedAmount(transaction.formatted, 18);
   const [isInsufficient] = useAtom(jotaiIsInsufficient);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   return (
     <Flex flexDir={"column"} gap={"32px"} width={"100%"}>
       <Flex
@@ -45,8 +48,13 @@ export const DepositWithdrawComponent: React.FC = () => {
         <DepositButtonComponent
           disabled={!isAvailableToDeposit || isInsufficient}
           content={isInsufficient ? "Insufficient balance" : "Deposit"}
+          onClick={() => setIsConfirmModalOpen(true)}
         />
       )}
+      <DepositConfirmModal
+        isOpen={isConfirmModalOpen}
+        setIsOpen={setIsConfirmModalOpen}
+      />
     </Flex>
   );
 };

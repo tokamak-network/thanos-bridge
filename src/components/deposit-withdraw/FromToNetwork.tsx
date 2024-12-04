@@ -9,11 +9,11 @@ import L1NetworkIcon from "@/assets/icons/network/l1-network.svg";
 import L2NetworkIcon from "@/assets/icons/network/l2-network.svg";
 import { getChainLayer } from "@/utils/network";
 import { ChainLayerEnum } from "@/types/network";
-import ArrowLeftIcon from "@/assets/icons/arrow/arrow-left.svg";
 import { MenuRoot, MenuTrigger } from "@/components/ui/menu";
 import { NetworkListComponent } from "../network/NetworkList";
 import { l1Chain, l2Chain } from "@/config/network";
 import { useNetwork } from "@/hooks/network/useNetwork";
+import { ArrowRightIconComponent } from "../icons/ArrowRight";
 
 export const FromToNetworkComponent: React.FC = () => {
   const [transaction] = useAtom(jotaiBridgeTransactionInfo);
@@ -99,7 +99,7 @@ export const FromToNetworkComponent: React.FC = () => {
         borderRadius={"6px"}
         border={"1px solid #25282F"}
       >
-        <Image src={ArrowLeftIcon} alt="arrow left" />
+        <ArrowRightIconComponent />
       </Button>
       <Flex
         flexDir={"column"}

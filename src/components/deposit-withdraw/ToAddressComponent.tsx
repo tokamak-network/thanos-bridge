@@ -55,7 +55,7 @@ export const ToAddressComponent: React.FC = () => {
       )}
       {isValid && !isConnectedAddress && (
         <Text color={"#F9C03E"} fontWeight={400}>
-          This is your connected wallet address
+          This is not your connected wallet address
         </Text>
       )}
     </Flex>

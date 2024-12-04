@@ -8,7 +8,7 @@ interface IDepositButtonComponentProps extends ButtonProps {
 export const DepositButtonComponent: React.FC<IDepositButtonComponentProps> = ({
   ...props
 }) => {
-  const { disabled, content } = props;
+  const { disabled, content, onClick } = props;
   return (
     <Button
       py={"16px"}
@@ -22,6 +22,7 @@ export const DepositButtonComponent: React.FC<IDepositButtonComponentProps> = ({
       color={disabled ? "#BBBEC6" : "#FFFFFF"}
       boxSizing={"content-box"}
       disabled={disabled}
+      onClick={onClick}
     >
       {content ?? "Deposit"}
     </Button>
