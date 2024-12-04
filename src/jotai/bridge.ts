@@ -4,6 +4,8 @@ import {
   BridgeTokenEnum,
   BridgeTransactionInfo,
 } from "@/types/bridge";
+import { TransactionStatusEnum } from "@/types/transaction";
+import { TransactionConfirmModalProps } from "@/types/transaction";
 import { atom } from "jotai";
 
 export const jotaiBridgeTransactionInfo = atom<BridgeTransactionInfo>({
@@ -20,3 +22,9 @@ export const jotaiBridgeTransactionInfo = atom<BridgeTransactionInfo>({
 export const jotaiTokenSelectModalOpen = atom<boolean>(false);
 
 export const jotaiIsInsufficient = atom<boolean>(false);
+
+export const jotaiTransactionConfirmModalStatus =
+  atom<TransactionConfirmModalProps>({
+    isOpen: false,
+    status: TransactionStatusEnum.CONFIRMING,
+  });
