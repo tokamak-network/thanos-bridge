@@ -26,5 +26,6 @@ export const jotaiIsInsufficient = atom<boolean>(false);
 export const jotaiTransactionConfirmModalStatus =
   atom<TransactionConfirmModalProps>({
     isOpen: false,
-    status: TransactionStatusEnum.CONFIRMING,
+    status: TransactionStatusEnum.NONE,
+    mode: BridgeModeEnum.DEPOSIT,
   });

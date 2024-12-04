@@ -20,7 +20,9 @@ import { DepositButtonComponent } from "../DepositButton";
 export const DepositConfirmModal: React.FC<{
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-}> = ({ isOpen, setIsOpen }) => {
+  onClick: () => Promise<void>;
+  isLoading: boolean;
+}> = ({ isOpen, setIsOpen, onClick, isLoading }) => {
   const [transaction] = useAtom(jotaiBridgeTransactionInfo);
   return (
     <DialogRoot
@@ -72,7 +74,11 @@ export const DepositConfirmModal: React.FC<{
           <TransactionDetailComponent transaction={transaction} />
         </DialogBody>
         <DialogFooter>
-          <DepositButtonComponent height={"48px"} />
+          <DepositButtonComponent
+            height={"48px"}
+            onClick={onClick}
+            isLoading={isLoading}
+          />
         </DialogFooter>
       </DialogContent>
     </DialogRoot>

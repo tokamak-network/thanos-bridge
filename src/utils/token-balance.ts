@@ -1,7 +1,7 @@
 import { config } from "@/config/wagmi.config";
 import { TokenBalance } from "@/types/token";
 import { getBalance } from "@wagmi/core";
-import { parseUnits } from "ethers";
+import { parseUnits } from "viem";
 import { getTokenInfoByAddress } from "./token";
 
 export const getParsedAmount = (amount: string, decimals: number) => {
