@@ -55,24 +55,22 @@ export const supportedTokens: Token[] = [
   //   decimals: 6,
   //   address: process.env.L2_USDT_ADDRESS,
   // },
-  // {
-  //   chainId: l1Chain.id,
-  //   isNativeCurrency: false,
-  //   name: "USDC",
-  //   symbol: "USDC",
-  //   decimals: 6,
-  //   address:
-  //     process.env.L1_USDC_ADDRESS ||
-  //     "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-  // },
-  // {
-  //   chainId: l2Chain.id,
-  //   isNativeCurrency: false,
-  //   name: "USDC",
-  //   symbol: "USDC",
-  //   decimals: 6,
-  //   address:
-  //     process.env.L1_USDC_ADDRESS ||
-  //     "0x4200000000000000000000000000000000000778",
-  // },
+  {
+    chainId: l1Chain.id,
+    isNativeCurrency: false,
+    name: "USDC",
+    symbol: "USDC",
+    decimals: 6,
+    address:
+      (process.env.NEXT_PUBLIC_L1_USDC_ADDRESS as `0x${string}`) ||
+      "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+  },
+  {
+    chainId: l2Chain.id,
+    isNativeCurrency: false,
+    name: "USDC",
+    symbol: "USDC",
+    decimals: 6,
+    address: "0x4200000000000000000000000000000000000778",
+  },
 ];

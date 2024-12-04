@@ -17,7 +17,7 @@ import { getBridgeToken } from "@/utils/bridge";
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
 
 export const MaxBalanceButtonComponent: React.FC<ButtonProps> = (props) => {
-  const { onClick } = props;
+  const { onClick, disabled } = props;
   return (
     <Button
       height={"fit-content"}
@@ -30,6 +30,7 @@ export const MaxBalanceButtonComponent: React.FC<ButtonProps> = (props) => {
       fontWeight={600}
       lineHeight={"normal"}
       onClick={onClick}
+      disabled={disabled}
     >
       Max
     </Button>
@@ -105,7 +106,10 @@ export const TokenInputComponent: React.FC = () => {
             <Text fontWeight={400} color={"#8C8F97"}>
               {`Balance: ${trimTokenBalance(balance?.formatted ?? "0", 2)}`}
             </Text>
-            <MaxBalanceButtonComponent onClick={handleMaxButtonClick} />
+            <MaxBalanceButtonComponent
+              onClick={handleMaxButtonClick}
+              disabled={balance?.value === transaction.amount}
+            />
           </Flex>
         )}
       </Flex>
