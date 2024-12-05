@@ -15,7 +15,7 @@ import { useAtom } from "jotai";
 import { jotaiBridgeTransactionInfo } from "@/jotai/bridge";
 import { NetworkInfoComponent } from "./NetworkInfoComponent";
 import { TransactionDetailComponent } from "./TransactionDetailComponent";
-import { DepositButtonComponent } from "../DepositButton";
+import { BigButtonComponent } from "../DepositButton";
 
 export const DepositConfirmModal: React.FC<{
   isOpen: boolean;
@@ -74,10 +74,11 @@ export const DepositConfirmModal: React.FC<{
           <TransactionDetailComponent transaction={transaction} />
         </DialogBody>
         <DialogFooter>
-          <DepositButtonComponent
+          <BigButtonComponent
             height={"48px"}
             onClick={onClick}
             isLoading={isLoading}
+            content="Deposit"
           />
         </DialogFooter>
       </DialogContent>

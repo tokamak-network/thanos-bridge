@@ -1,8 +1,8 @@
 "use client";
-import { BridgeModeEnum } from "@/types/bridge";
+import { BridgeModeEnum, BridgeTokenEnum } from "@/types/bridge";
 import { Flex } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { DepositButtonComponent } from "./DepositButton";
+import { BigButtonComponent } from "./DepositButton";
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
 import { FromToNetworkComponent } from "./FromToNetwork";
 import {
@@ -15,21 +15,33 @@ import { TokenInputComponent } from "./TokenInputComponent";
 import { getParsedAmount } from "@/utils/token-balance";
 import { ReceiveAmountComponent } from "./ReceiveAmountComponent";
 import { getBridgeToken } from "@/utils/bridge";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DepositConfirmModal } from "./confirm-modal/DepositConfirmModal";
 import { useDeposit } from "@/hooks/bridge/useDeposit";
 import { TransactionStatusEnum } from "@/types/transaction";
+import { useApprove } from "@/hooks/bridge/useApprove";
 
 export const DepositWithdrawComponent: React.FC = () => {
   const [transaction] = useAtom(jotaiBridgeTransactionInfo);
   const [transactionConfirmModalStatus, setTransactionConfirmModalStatus] =
     useAtom(jotaiTransactionConfirmModalStatus);
+  const [isApproving, setIsApproving] = useState<boolean>(false);
+  const [isApproved, setIsApproved] = useState<boolean>(false);
+  const { deposit } = useDeposit();
+  const { approve } = useApprove(setIsApproving, setIsApproved);
   const { isConnected } = useWalletConnect();
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [isInsufficient] = useAtom(jotaiIsInsufficient);
   const isAvailableToDeposit =
     transaction.formatted !== "" && getParsedAmount(transaction.formatted, 18);
-  const [isInsufficient] = useAtom(jotaiIsInsufficient);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-  const { deposit } = useDeposit();
+  const needToApprove =
+    transaction.mode === BridgeModeEnum.DEPOSIT &&
+    transaction.bridgeTokenType !== BridgeTokenEnum.ETH;
+  useEffect(() => {
+    if (transaction.bridgeTokenType === BridgeTokenEnum.ETH)
+      setIsApproved(true);
+    else setIsApproved(false);
+  }, [transaction, setIsApproved]);
   const handleTransactionStateChange = (
     status: TransactionStatusEnum,
     txHash?: string
@@ -53,7 +65,10 @@ export const DepositWithdrawComponent: React.FC = () => {
       status: TransactionStatusEnum.CONFIRMING,
       mode: BridgeModeEnum.DEPOSIT,
     }));
-    await deposit(transaction, handleTransactionStateChange);
+    await deposit(transaction, handleTransactionStateChange, setIsApproved);
+  };
+  const handleApprove = async () => {
+    await approve(transaction);
   };
   return (
     <Flex flexDir={"column"} gap={"32px"} width={"100%"}>
@@ -75,13 +90,23 @@ export const DepositWithdrawComponent: React.FC = () => {
         )}
         <ToAddressComponent />
       </Flex>
-      {transaction.mode === BridgeModeEnum.DEPOSIT && isConnected && (
-        <DepositButtonComponent
+      {needToApprove && !isApproved && isConnected && (
+        <BigButtonComponent
           disabled={!isAvailableToDeposit || isInsufficient}
-          content={isInsufficient ? "Insufficient balance" : "Deposit"}
-          onClick={() => setIsConfirmModalOpen(true)}
+          content={isInsufficient ? "Insufficient balance" : "Approve"}
+          isLoading={isApproving}
+          onClick={handleApprove}
         />
       )}
+      {transaction.mode === BridgeModeEnum.DEPOSIT &&
+        isConnected &&
+        isApproved && (
+          <BigButtonComponent
+            disabled={!isAvailableToDeposit || isInsufficient}
+            content={isInsufficient ? "Insufficient balance" : "Deposit"}
+            onClick={() => setIsConfirmModalOpen(true)}
+          />
+        )}
       <DepositConfirmModal
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}

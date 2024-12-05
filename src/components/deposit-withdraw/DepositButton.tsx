@@ -1,12 +1,12 @@
 import { ButtonProps, Spinner } from "@chakra-ui/react";
 import { Button } from "../ui/button";
 
-interface IDepositButtonComponentProps extends ButtonProps {
+interface IBigButtonComponentProps extends ButtonProps {
   content?: string;
   isLoading?: boolean;
 }
 
-export const DepositButtonComponent: React.FC<IDepositButtonComponentProps> = ({
+export const BigButtonComponent: React.FC<IBigButtonComponentProps> = ({
   ...props
 }) => {
   const { disabled, content, onClick, isLoading } = props;
@@ -35,7 +35,7 @@ export const DepositButtonComponent: React.FC<IDepositButtonComponentProps> = ({
           css={{ "--spinner-track-color": "#25282F" }}
         />
       ) : (
-        (content ?? "Deposit")
+        content || ""
       )}
     </Button>
   );
