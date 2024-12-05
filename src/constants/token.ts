@@ -37,24 +37,22 @@ export const supportedTokens: Token[] = [
     decimals: 18,
     bridgedTokenSymbol: "native",
   },
-  // {
-  //   chainId: l1Chain.id,
-  //   isNativeCurrency: false,
-  //   name: "Tether USD",
-  //   symbol: "USDT",
-  //   decimals: 6,
-  //   address:
-  //     process.env.L1_USDT_ADDRESS ||
-  //     "0xdac17f958d2ee523a2206206994597c13d831ec7",
-  // },
-  // {
-  //   chainId: l2Chain.id,
-  //   isNativeCurrency: false,
-  //   name: "USDT",
-  //   symbol: "USDT",
-  //   decimals: 6,
-  //   address: process.env.L2_USDT_ADDRESS,
-  // },
+  {
+    chainId: l1Chain.id,
+    isNativeCurrency: false,
+    name: "Tether USD",
+    symbol: "USDT",
+    decimals: 6,
+    address: process.env.NEXT_PUBLIC_L1_USDT_ADDRESS as `0x${string}`,
+  },
+  {
+    chainId: l2Chain.id,
+    isNativeCurrency: false,
+    name: "USDT",
+    symbol: "USDT",
+    decimals: 6,
+    address: process.env.NEXT_PUBLIC_L2_USDT_ADDRESS as `0x${string}`,
+  },
   {
     chainId: l1Chain.id,
     isNativeCurrency: false,

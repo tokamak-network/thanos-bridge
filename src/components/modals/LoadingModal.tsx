@@ -23,6 +23,7 @@ export const LoadingModalComponent: React.FC = () => {
             height={"200px"}
             borderWidth={"10px"}
             color={"#0070ED"}
+            css={{ "--spinner-track-color": "#25282F" }}
             animationDuration={"1s"}
           />
         </DialogBody>
