@@ -87,12 +87,50 @@ export const useWithdraw = () => {
     }
   };
 
-  const prove = async (txHash: string) => {
-    await crossChainMessenger?.proveMessage(txHash);
+  const prove = async (
+    txHash: string,
+    handleChangeTransactionState: (
+      status: TransactionStatusEnum,
+      txHash?: string
+    ) => void
+  ) => {
+    try {
+      if (!crossChainMessenger) return;
+      handleChangeTransactionState(TransactionStatusEnum.READY_TO_CONFIRM);
+      const response = await crossChainMessenger?.proveMessage(txHash);
+      handleChangeTransactionState(TransactionStatusEnum.CONFIRMING);
+      const depositTx = await response.wait();
+      handleChangeTransactionState(
+        TransactionStatusEnum.SUCCESS,
+        depositTx.transactionHash
+      );
+    } catch (error) {
+      console.error(error);
+      handleChangeTransactionState(TransactionStatusEnum.ERROR);
+    }
   };
 
-  const finalize = async (txHash: string) => {
-    await crossChainMessenger?.finalizeMessage(txHash);
+  const finalize = async (
+    txHash: string,
+    handleChangeTransactionState: (
+      status: TransactionStatusEnum,
+      txHash?: string
+    ) => void
+  ) => {
+    try {
+      if (!crossChainMessenger) return;
+      handleChangeTransactionState(TransactionStatusEnum.READY_TO_CONFIRM);
+      const response = await crossChainMessenger?.finalizeMessage(txHash);
+      handleChangeTransactionState(TransactionStatusEnum.CONFIRMING);
+      const depositTx = await response.wait();
+      handleChangeTransactionState(
+        TransactionStatusEnum.SUCCESS,
+        depositTx.transactionHash
+      );
+    } catch (error) {
+      console.error(error);
+      handleChangeTransactionState(TransactionStatusEnum.ERROR);
+    }
   };
 
   return { withdraw, prove, finalize };

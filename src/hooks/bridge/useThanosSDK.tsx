@@ -3,11 +3,18 @@ import { ethers } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 import { useWalletConnect } from "../wallet-connect/useWalletConnect";
 import { CrossChainMessenger } from "@tokamak-network/thanos-sdk";
+import { getChainLayer } from "@/utils/network";
+import { ChainLayerEnum } from "@/types/network";
+import { l1Provider, l2Provider } from "@/constants/provider";
 
 export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
   const { isConnected, chain } = useWalletConnect();
   const [crossChainMessenger, setCrossChainMessenger] =
     useState<CrossChainMessenger | null>(null);
+  const chainLayer = useMemo(
+    () => (chain ? getChainLayer(chain.id) : null),
+    [chain]
+  );
   useEffect(() => {
     if (!l1ChainId || !l2ChainId) return;
     if (!isConnected) return;
@@ -35,12 +42,14 @@ export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
       },
       l1ChainId: l1ChainId,
       l2ChainId: l2ChainId,
-      l1SignerOrProvider: provider.getSigner(),
-      l2SignerOrProvider: provider.getSigner(),
+      l1SignerOrProvider:
+        chainLayer === ChainLayerEnum.L1 ? provider.getSigner() : l1Provider,
+      l2SignerOrProvider:
+        chainLayer === ChainLayerEnum.L2 ? provider.getSigner() : l2Provider,
       nativeTokenAddress: process.env.NEXT_PUBLIC_NATIVE_TOKEN_L1_ADDRESS,
     });
     setCrossChainMessenger(cm);
-  }, [l1ChainId, l2ChainId, chain, isConnected]);
+  }, [l1ChainId, l2ChainId, chain, isConnected, chainLayer]);
 
   const estimateGas = useMemo(() => {
     if (!crossChainMessenger) return null;

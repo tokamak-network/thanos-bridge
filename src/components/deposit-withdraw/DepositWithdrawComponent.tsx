@@ -110,10 +110,10 @@ export const DepositWithdrawComponent: React.FC = () => {
     await approve(transaction);
   };
   const handleProveTransaction = async () => {
-    await prove(initiateTxHash);
+    await prove(initiateTxHash, handleTransactionStateChange);
   };
   const handleFinalizeTransaction = async () => {
-    await finalize(initiateTxHash);
+    await finalize(initiateTxHash, handleTransactionStateChange);
   };
   return (
     <Flex flexDir={"column"} gap={"32px"} width={"100%"}>
@@ -187,6 +187,10 @@ export const DepositWithdrawComponent: React.FC = () => {
               await handleProveTransaction();
             }}
             disabled={!isValidInitiateTxHash}
+            isLoading={
+              transactionConfirmModalStatus.status ===
+              TransactionStatusEnum.READY_TO_CONFIRM
+            }
           />
         )}
       {transaction.mode === BridgeModeEnum.WITHDRAW &&
@@ -196,8 +200,12 @@ export const DepositWithdrawComponent: React.FC = () => {
             content={"Finalize"}
             disabled={!isValidInitiateTxHash}
             onClick={async () => {
-              await handleProveTransaction();
+              await handleFinalizeTransaction();
             }}
+            isLoading={
+              transactionConfirmModalStatus.status ===
+              TransactionStatusEnum.READY_TO_CONFIRM
+            }
           />
         )}
       <DepositWithdrawConfirmModal
