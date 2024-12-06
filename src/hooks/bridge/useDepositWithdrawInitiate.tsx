@@ -21,12 +21,16 @@ export const useDepositWithdrawInitiate = () => {
     if (transaction.mode === BridgeModeEnum.DEPOSIT) {
       setTransaction((prev) => ({
         ...prev,
+        amount: BigInt(0),
+        formatted: "",
         fromChain: l1Chain,
         toChain: l2Chain,
       }));
     } else {
       setTransaction((prev) => ({
         ...prev,
+        amount: BigInt(0),
+        formatted: "",
         fromChain: l2Chain,
         toChain: l1Chain,
       }));
