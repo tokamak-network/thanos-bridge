@@ -50,7 +50,11 @@ export const DepositWithdrawConfirmModal: React.FC<{
             alignItems={"center"}
           >
             <Text fontSize={"18px"} fontWeight={"600"}>
-              Confirm Deposit
+              {`Confirm ${
+                transaction.mode === BridgeModeEnum.DEPOSIT
+                  ? "Deposit"
+                  : "Withdraw"
+              }`}
             </Text>
             <Button
               bgColor={"transparent"}

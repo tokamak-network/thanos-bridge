@@ -19,3 +19,8 @@ export const getBridgeToken = (transaction: BridgeTransactionInfo) => {
     ? transaction.l1Token
     : transaction.l2Token;
 };
+
+export const isValidTxHash = (txHash: string): boolean => {
+  const pattern = /^0x[a-fA-F0-9]{64}$/;
+  return pattern.test(txHash);
+};

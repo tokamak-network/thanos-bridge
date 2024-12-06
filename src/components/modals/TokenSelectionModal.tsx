@@ -38,6 +38,8 @@ export const TokenSelectionModalComponent = () => {
     );
     setTransaction((prev) => ({
       ...prev,
+      amount: BigInt(0),
+      formatted: "",
       l1Token: transaction.mode === BridgeModeEnum.DEPOSIT ? token : token2,
       l2Token: transaction.mode === BridgeModeEnum.DEPOSIT ? token2 : token,
     }));

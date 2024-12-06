@@ -12,6 +12,12 @@ export enum BridgeTokenEnum {
   ERC_20 = "ERC-20",
 }
 
+export enum WithdrawStepEnum {
+  INITIATE = "Initiate",
+  PROVE = "Prove",
+  FINALIZE = "Finalize",
+}
+
 export interface BridgeTransactionInfo {
   mode: BridgeModeEnum;
   fromChain: Chain;
