@@ -44,6 +44,7 @@ export const supportedTokens: Token[] = [
     symbol: "USDT",
     decimals: 6,
     address: process.env.NEXT_PUBLIC_L1_USDT_ADDRESS as `0x${string}`,
+    bridgedTokenSymbol: "usdt",
   },
   {
     chainId: l2Chain.id,
@@ -52,6 +53,7 @@ export const supportedTokens: Token[] = [
     symbol: "USDT",
     decimals: 6,
     address: process.env.NEXT_PUBLIC_L2_USDT_ADDRESS as `0x${string}`,
+    bridgedTokenSymbol: "usdt",
   },
   {
     chainId: l1Chain.id,
@@ -62,6 +64,7 @@ export const supportedTokens: Token[] = [
     address:
       (process.env.NEXT_PUBLIC_L1_USDC_ADDRESS as `0x${string}`) ||
       "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+    bridgedTokenSymbol: "usdc",
   },
   {
     chainId: l2Chain.id,
@@ -70,5 +73,6 @@ export const supportedTokens: Token[] = [
     symbol: "USDC",
     decimals: 6,
     address: "0x4200000000000000000000000000000000000778",
+    bridgedTokenSymbol: "usdc",
   },
 ];

@@ -208,17 +208,19 @@ export const DepositWithdrawComponent: React.FC = () => {
             }
           />
         )}
-      <DepositWithdrawConfirmModal
-        isOpen={isConfirmModalOpen}
-        setIsOpen={setIsConfirmModalOpen}
-        onClick={async (transaction: BridgeTransactionInfo) =>
-          await handleBridge(transaction)
-        }
-        isLoading={
-          transactionConfirmModalStatus.status ===
-          TransactionStatusEnum.READY_TO_CONFIRM
-        }
-      />
+      {isConnected && (
+        <DepositWithdrawConfirmModal
+          isOpen={isConfirmModalOpen}
+          setIsOpen={setIsConfirmModalOpen}
+          onClick={async (transaction: BridgeTransactionInfo) =>
+            await handleBridge(transaction)
+          }
+          isLoading={
+            transactionConfirmModalStatus.status ===
+            TransactionStatusEnum.READY_TO_CONFIRM
+          }
+        />
+      )}
     </Flex>
   );
 };
