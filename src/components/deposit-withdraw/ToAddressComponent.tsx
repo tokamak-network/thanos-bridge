@@ -21,7 +21,10 @@ export const ToAddressComponent: React.FC = () => {
     [transaction.toAddress]
   );
   const isConnectedAddress = useMemo(() => {
-    return isConnected && address === transaction.toAddress;
+    return (
+      isConnected &&
+      address?.toLowerCase() === transaction.toAddress.toLowerCase()
+    );
   }, [address, transaction.toAddress, isConnected]);
   return (
     <Flex gap={"6px"} flexDir={"column"}>

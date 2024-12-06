@@ -1,5 +1,5 @@
 import { ButtonProps, Spinner } from "@chakra-ui/react";
-import { Button } from "../ui/button";
+import { Button } from "./button";
 
 interface IBigButtonComponentProps extends ButtonProps {
   content?: string;

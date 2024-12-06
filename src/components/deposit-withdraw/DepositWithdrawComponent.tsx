@@ -1,9 +1,13 @@
 "use client";
-import { BridgeModeEnum, BridgeTokenEnum } from "@/types/bridge";
+import {
+  BridgeModeEnum,
+  BridgeTokenEnum,
+  BridgeTransactionInfo,
+} from "@/types/bridge";
 import { Flex } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { BigButtonComponent } from "./DepositButton";
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
+import { BigButtonComponent } from "../ui/BigButton";
 import { FromToNetworkComponent } from "./FromToNetwork";
 import {
   jotaiBridgeTransactionInfo,
@@ -14,25 +18,35 @@ import { ToAddressComponent } from "./ToAddressComponent";
 import { TokenInputComponent } from "./TokenInputComponent";
 import { getParsedAmount } from "@/utils/token-balance";
 import { ReceiveAmountComponent } from "./ReceiveAmountComponent";
-import { getBridgeToken } from "@/utils/bridge";
+import { getBridgeToken, isValidTxHash } from "@/utils/bridge";
 import { useEffect, useState } from "react";
-import { DepositConfirmModal } from "./confirm-modal/DepositConfirmModal";
+import { DepositWithdrawConfirmModal } from "./confirm-modal/DepositWithdrawConfirmModal";
 import { useDeposit } from "@/hooks/bridge/useDeposit";
 import { TransactionStatusEnum } from "@/types/transaction";
 import { useApprove } from "@/hooks/bridge/useApprove";
+import { useWithdraw } from "@/hooks/bridge/useWithdraw";
+import { BridgingStepEnum } from "../../types/bridge";
+import { WithdrawStepComponent } from "./WithdrawStep";
+import { ProveFinalizeWithdrawalComponent } from "./ProveFinalizeWithdrawal";
+import { useNetwork } from "@/hooks/network/useNetwork";
 
 export const DepositWithdrawComponent: React.FC = () => {
-  const [transaction] = useAtom(jotaiBridgeTransactionInfo);
+  const [transaction, setTransaction] = useAtom(jotaiBridgeTransactionInfo);
   const [transactionConfirmModalStatus, setTransactionConfirmModalStatus] =
     useAtom(jotaiTransactionConfirmModalStatus);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isApproved, setIsApproved] = useState<boolean>(false);
+  const [isValidInitiateTxHash, setIsValidInitiateTxHash] =
+    useState<boolean>(false);
+  const [initiateTxHash, setInitiateTxHash] = useState<string>("");
+  const { switchToL1, switchToL2 } = useNetwork();
   const { deposit } = useDeposit();
+  const { withdraw, prove, finalize } = useWithdraw();
   const { approve } = useApprove(setIsApproving, setIsApproved);
   const { isConnected } = useWalletConnect();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [isInsufficient] = useAtom(jotaiIsInsufficient);
-  const isAvailableToDeposit =
+  const isAvailableToBridge =
     transaction.formatted !== "" && getParsedAmount(transaction.formatted, 18);
   const needToApprove =
     transaction.mode === BridgeModeEnum.DEPOSIT &&
@@ -42,6 +56,13 @@ export const DepositWithdrawComponent: React.FC = () => {
       setIsApproved(true);
     else setIsApproved(false);
   }, [transaction, setIsApproved]);
+  useEffect(() => {
+    if (transaction.mode === BridgeModeEnum.WITHDRAW)
+      setTransaction((prev) => ({
+        ...prev,
+        step: BridgingStepEnum.INITIATE,
+      }));
+  }, [transaction.mode, setTransaction]);
   const handleTransactionStateChange = (
     status: TransactionStatusEnum,
     txHash?: string
@@ -59,16 +80,40 @@ export const DepositWithdrawComponent: React.FC = () => {
       txHash,
     }));
   };
-  const handleDeposit = async () => {
+  const handleInitiateTxHashChange = (value: string) => {
+    setInitiateTxHash(value);
+    setIsValidInitiateTxHash(isValidTxHash(value));
+  };
+  const handleBridgeStepChange = async (step: BridgingStepEnum) => {
+    if (transaction.mode === BridgeModeEnum.DEPOSIT) return;
+    setInitiateTxHash("");
+    setIsValidInitiateTxHash(false);
+    setTransaction((prev) => ({
+      ...prev,
+      step,
+    }));
+    if (step === BridgingStepEnum.INITIATE) await switchToL2();
+    else await switchToL1();
+  };
+  const handleBridge = async (transaction: BridgeTransactionInfo) => {
     setTransactionConfirmModalStatus((prev) => ({
       ...prev,
       status: TransactionStatusEnum.CONFIRMING,
-      mode: BridgeModeEnum.DEPOSIT,
+      mode: transaction.mode,
     }));
-    await deposit(transaction, handleTransactionStateChange, setIsApproved);
+    if (transaction.mode === BridgeModeEnum.DEPOSIT)
+      await deposit(transaction, handleTransactionStateChange, setIsApproved);
+    else
+      await withdraw(transaction, handleTransactionStateChange, setIsApproved);
   };
   const handleApprove = async () => {
     await approve(transaction);
+  };
+  const handleProveTransaction = async () => {
+    await prove(initiateTxHash, handleTransactionStateChange);
+  };
+  const handleFinalizeTransaction = async () => {
+    await finalize(initiateTxHash, handleTransactionStateChange);
   };
   return (
     <Flex flexDir={"column"} gap={"32px"} width={"100%"}>
@@ -80,19 +125,36 @@ export const DepositWithdrawComponent: React.FC = () => {
         gap={"16px"}
         flexDir={"column"}
       >
-        <FromToNetworkComponent />
-        <TokenInputComponent />
-        {transaction.amount && isConnected && (
-          <ReceiveAmountComponent
-            amount={transaction.formatted}
-            tokenSymbol={getBridgeToken(transaction)?.symbol ?? ""}
+        {transaction.mode === BridgeModeEnum.WITHDRAW && (
+          <WithdrawStepComponent
+            step={transaction.step}
+            setStep={handleBridgeStepChange}
           />
         )}
-        <ToAddressComponent />
+        {transaction.mode === BridgeModeEnum.WITHDRAW &&
+        transaction.step !== BridgingStepEnum.INITIATE ? (
+          <ProveFinalizeWithdrawalComponent
+            isValid={isValidInitiateTxHash || initiateTxHash.length === 0}
+            onChange={handleInitiateTxHashChange}
+            initiateTxHash={initiateTxHash}
+          />
+        ) : (
+          <>
+            <FromToNetworkComponent />
+            <TokenInputComponent />
+            {transaction.amount && isConnected && (
+              <ReceiveAmountComponent
+                amount={transaction.formatted}
+                tokenSymbol={getBridgeToken(transaction)?.symbol ?? ""}
+              />
+            )}
+            <ToAddressComponent />
+          </>
+        )}
       </Flex>
       {needToApprove && !isApproved && isConnected && (
         <BigButtonComponent
-          disabled={!isAvailableToDeposit || isInsufficient}
+          disabled={!isAvailableToBridge || isInsufficient}
           content={isInsufficient ? "Insufficient balance" : "Approve"}
           isLoading={isApproving}
           onClick={handleApprove}
@@ -102,15 +164,56 @@ export const DepositWithdrawComponent: React.FC = () => {
         isConnected &&
         isApproved && (
           <BigButtonComponent
-            disabled={!isAvailableToDeposit || isInsufficient}
+            disabled={!isAvailableToBridge || isInsufficient}
             content={isInsufficient ? "Insufficient balance" : "Deposit"}
             onClick={() => setIsConfirmModalOpen(true)}
           />
         )}
-      <DepositConfirmModal
+      {transaction.mode === BridgeModeEnum.WITHDRAW &&
+        transaction.step === BridgingStepEnum.INITIATE &&
+        isConnected && (
+          <BigButtonComponent
+            disabled={!isAvailableToBridge || isInsufficient}
+            content={isInsufficient ? "Insufficient balance" : "Withdraw"}
+            onClick={() => setIsConfirmModalOpen(true)}
+          />
+        )}
+      {transaction.mode === BridgeModeEnum.WITHDRAW &&
+        transaction.step === BridgingStepEnum.PROVE &&
+        isConnected && (
+          <BigButtonComponent
+            content={"Prove"}
+            onClick={async () => {
+              await handleProveTransaction();
+            }}
+            disabled={!isValidInitiateTxHash}
+            isLoading={
+              transactionConfirmModalStatus.status ===
+              TransactionStatusEnum.READY_TO_CONFIRM
+            }
+          />
+        )}
+      {transaction.mode === BridgeModeEnum.WITHDRAW &&
+        transaction.step === BridgingStepEnum.FINALIZE &&
+        isConnected && (
+          <BigButtonComponent
+            content={"Finalize"}
+            disabled={!isValidInitiateTxHash}
+            onClick={async () => {
+              await handleFinalizeTransaction();
+            }}
+            isLoading={
+              transactionConfirmModalStatus.status ===
+              TransactionStatusEnum.READY_TO_CONFIRM
+            }
+          />
+        )}
+      <DepositWithdrawConfirmModal
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
-        onClick={async () => await handleDeposit()}
+        onClick={async (transaction: BridgeTransactionInfo) =>
+          await handleBridge(transaction)
+        }
         isLoading={
           transactionConfirmModalStatus.status ===
           TransactionStatusEnum.READY_TO_CONFIRM

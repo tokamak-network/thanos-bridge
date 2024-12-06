@@ -15,12 +15,13 @@ import { useAtom } from "jotai";
 import { jotaiBridgeTransactionInfo } from "@/jotai/bridge";
 import { NetworkInfoComponent } from "./NetworkInfoComponent";
 import { TransactionDetailComponent } from "./TransactionDetailComponent";
-import { BigButtonComponent } from "../DepositButton";
+import { BigButtonComponent } from "@/components/ui/BigButton";
+import { BridgeModeEnum, BridgeTransactionInfo } from "@/types/bridge";
 
-export const DepositConfirmModal: React.FC<{
+export const DepositWithdrawConfirmModal: React.FC<{
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onClick: () => Promise<void>;
+  onClick: (transaction: BridgeTransactionInfo) => Promise<void>;
   isLoading: boolean;
 }> = ({ isOpen, setIsOpen, onClick, isLoading }) => {
   const [transaction] = useAtom(jotaiBridgeTransactionInfo);
@@ -49,7 +50,11 @@ export const DepositConfirmModal: React.FC<{
             alignItems={"center"}
           >
             <Text fontSize={"18px"} fontWeight={"600"}>
-              Confirm Deposit
+              {`Confirm ${
+                transaction.mode === BridgeModeEnum.DEPOSIT
+                  ? "Deposit"
+                  : "Withdraw"
+              }`}
             </Text>
             <Button
               bgColor={"transparent"}
@@ -76,9 +81,13 @@ export const DepositConfirmModal: React.FC<{
         <DialogFooter>
           <BigButtonComponent
             height={"48px"}
-            onClick={onClick}
+            onClick={() => onClick(transaction)}
             isLoading={isLoading}
-            content="Deposit"
+            content={
+              transaction.mode === BridgeModeEnum.DEPOSIT
+                ? "Deposit"
+                : "Withdraw"
+            }
           />
         </DialogFooter>
       </DialogContent>

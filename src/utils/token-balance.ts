@@ -10,11 +10,13 @@ export const getParsedAmount = (amount: string, decimals: number) => {
 
 export const getTokenBalance = async (
   address: `0x${string}`,
-  token?: `0x${string}`
+  token?: `0x${string}`,
+  chainId?: number
 ): Promise<TokenBalance> => {
   const balance = await getBalance(config, {
     address,
     token,
+    chainId,
   });
   return balance;
 };
@@ -26,7 +28,7 @@ export const getTokenBalanceByChainId = async (
 ): Promise<TokenBalance | null> => {
   const tokenInfo = getTokenInfoByAddress(chainId, token);
   if (!tokenInfo) return null;
-  const balance = await getTokenBalance(address, tokenInfo.address);
+  const balance = await getTokenBalance(address, tokenInfo.address, chainId);
   return balance;
 };
 

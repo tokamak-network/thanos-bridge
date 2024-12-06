@@ -2,14 +2,20 @@ import { useEffect } from "react";
 import { useWalletConnect } from "../wallet-connect/useWalletConnect";
 import { useAtom } from "jotai";
 import { jotaiBridgeTransactionInfo } from "@/jotai/bridge";
-import { BridgeModeEnum } from "@/types/bridge";
+import {
+  BridgeModeEnum,
+  BridgeTransactionInfo,
+  BridgingStepEnum,
+} from "@/types/bridge";
 import { l1Chain, l2Chain } from "@/config/network";
 import { getTokenInfoByChainId } from "@/utils/token";
 import { supportedTokens } from "@/constants/token";
 import { getBridgeTokenType } from "@/utils/bridge";
+import { ChainLayerEnum } from "@/types/network";
+import { getChainLayer } from "@/utils/network";
 
 export const useDepositWithdrawInitiate = () => {
-  const { isConnected, address } = useWalletConnect();
+  const { isConnected, address, chain } = useWalletConnect();
   const [transaction, setTransaction] = useAtom(jotaiBridgeTransactionInfo);
   useEffect(() => {
     if (transaction.mode === BridgeModeEnum.DEPOSIT) {
@@ -59,5 +65,24 @@ export const useDepositWithdrawInitiate = () => {
     );
     setTransaction((prev) => ({ ...prev, bridgeTokenType }));
   }, [transaction.l1Token, transaction.l2Token, setTransaction]);
+
+  useEffect(() => {
+    if (!chain) return;
+    const chainLayer = getChainLayer(chain.id);
+    if (
+      chainLayer === ChainLayerEnum.L1 &&
+      (transaction.step === BridgingStepEnum.PROVE ||
+        transaction.step === BridgingStepEnum.FINALIZE)
+    )
+      return;
+    setTransaction((prev: BridgeTransactionInfo) => ({
+      ...prev,
+      mode:
+        chainLayer === ChainLayerEnum.L1
+          ? BridgeModeEnum.DEPOSIT
+          : BridgeModeEnum.WITHDRAW,
+      step: BridgingStepEnum.INITIATE,
+    }));
+  }, [chain, transaction.mode, setTransaction, transaction.step]);
   return { transaction };
 };
