@@ -3,6 +3,7 @@ import {
   BridgeModeEnum,
   BridgeTokenEnum,
   BridgeTransactionInfo,
+  BridgingStepEnum,
 } from "@/types/bridge";
 import { TransactionStatusEnum } from "@/types/transaction";
 import { TransactionConfirmModalProps } from "@/types/transaction";
@@ -17,6 +18,7 @@ export const jotaiBridgeTransactionInfo = atom<BridgeTransactionInfo>({
   amount: BigInt(0),
   formatted: "",
   bridgeTokenType: BridgeTokenEnum.ETH,
+  step: BridgingStepEnum.INITIATE,
 });
 
 export const jotaiTokenSelectModalOpen = atom<boolean>(false);

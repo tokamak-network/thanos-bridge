@@ -14,6 +14,7 @@ export const DepositWithdrawTabComponent: React.FC = () => {
   const { switchToL1, switchToL2 } = useNetwork();
   const { chain } = useWalletConnect();
   const handleClick = async (status: BridgeModeEnum) => {
+    if (status === transaction.mode) return;
     if (status === BridgeModeEnum.DEPOSIT) {
       await switchToL1();
     } else {
@@ -24,18 +25,6 @@ export const DepositWithdrawTabComponent: React.FC = () => {
       mode: status,
     }));
   };
-
-  useEffect(() => {
-    if (!chain) return;
-    const chainLayer = getChainLayer(chain.id);
-    setTransaction((prev: BridgeTransactionInfo) => ({
-      ...prev,
-      mode:
-        chainLayer === ChainLayerEnum.L1
-          ? BridgeModeEnum.DEPOSIT
-          : BridgeModeEnum.WITHDRAW,
-    }));
-  }, [chain, setTransaction]);
 
   return (
     <Flex

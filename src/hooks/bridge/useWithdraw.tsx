@@ -87,5 +87,13 @@ export const useWithdraw = () => {
     }
   };
 
-  return { withdraw };
+  const prove = async (txHash: string) => {
+    await crossChainMessenger?.proveMessage(txHash);
+  };
+
+  const finalize = async (txHash: string) => {
+    await crossChainMessenger?.finalizeMessage(txHash);
+  };
+
+  return { withdraw, prove, finalize };
 };

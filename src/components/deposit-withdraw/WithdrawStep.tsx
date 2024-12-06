@@ -1,19 +1,19 @@
-import { WithdrawStepEnum } from "@/types/bridge";
+import { BridgingStepEnum } from "@/types/bridge";
 import { Flex } from "@chakra-ui/react";
 import React from "react";
 
 interface IWithdrawStepComponentProps {
-  step: WithdrawStepEnum;
-  setStep: (step: WithdrawStepEnum) => void;
+  step: BridgingStepEnum;
+  setStep: (step: BridgingStepEnum) => void;
 }
 export const WithdrawStepComponent: React.FC<IWithdrawStepComponentProps> = ({
   step,
   setStep,
 }) => {
   const steps = [
-    WithdrawStepEnum.INITIATE,
-    WithdrawStepEnum.PROVE,
-    WithdrawStepEnum.FINALIZE,
+    BridgingStepEnum.INITIATE,
+    BridgingStepEnum.PROVE,
+    BridgingStepEnum.FINALIZE,
   ];
   return (
     <Flex
