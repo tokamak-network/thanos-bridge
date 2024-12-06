@@ -83,6 +83,6 @@ export const useDepositWithdrawInitiate = () => {
           : BridgeModeEnum.WITHDRAW,
       step: BridgingStepEnum.INITIATE,
     }));
-  }, [chain, transaction.mode, setTransaction, transaction.step]);
+  }, [chain, transaction.mode, setTransaction]);
   return { transaction };
 };
