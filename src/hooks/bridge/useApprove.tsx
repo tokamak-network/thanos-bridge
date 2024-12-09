@@ -37,7 +37,11 @@ export const useApprove = (
 
   const approveUSDC = async (amount: bigint) => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const usdc = new ethers.Contract(L2_USDC_ADDRESS, erc20ABI, provider);
+    const usdc = new ethers.Contract(
+      L2_USDC_ADDRESS,
+      erc20ABI,
+      provider.getSigner()
+    );
     try {
       setIsApproving(true);
       const tx = await usdc.approve(L2_USDC_BRIDGE_ADDRESS, amount);
