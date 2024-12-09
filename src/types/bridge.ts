@@ -9,6 +9,7 @@ export enum BridgeModeEnum {
 export enum BridgeTokenEnum {
   ETH = "ETH",
   NATIVE_TOKEN = "Native Token",
+  USDC = "USDC",
   ERC_20 = "ERC-20",
 }
 

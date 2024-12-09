@@ -2,6 +2,9 @@ import { BridgeTokenEnum, BridgeTransactionInfo } from "@/types/bridge";
 import { useThanosSDK } from "./useThanosSDK";
 import { l1Chain, l2Chain } from "@/config/network";
 import { AddressLike } from "@tokamak-network/thanos-sdk";
+import { ethers } from "ethers";
+import erc20ABI from "@/abi/erc20.json";
+import { L2_USDC_ADDRESS, L2_USDC_BRIDGE_ADDRESS } from "@/constants/contract";
 
 export const useApprove = (
   setIsApproving: (value: boolean) => void,
@@ -31,5 +34,20 @@ export const useApprove = (
       setIsApproving(false);
     }
   };
-  return { approve };
+
+  const approveUSDC = async (amount: bigint) => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const usdc = new ethers.Contract(L2_USDC_ADDRESS, erc20ABI, provider);
+    try {
+      setIsApproving(true);
+      const tx = await usdc.approve(L2_USDC_BRIDGE_ADDRESS, amount);
+      await tx.wait();
+      setIsApproved(true);
+    } catch (error) {
+      console.error("Approval failed:", error);
+    } finally {
+      setIsApproving(false);
+    }
+  };
+  return { approve, approveUSDC };
 };

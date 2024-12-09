@@ -63,10 +63,7 @@ export const useDepositWithdrawInitiate = () => {
 
   useEffect(() => {
     if (!transaction.l1Token || !transaction.l2Token) return;
-    const bridgeTokenType = getBridgeTokenType(
-      transaction.l1Token,
-      transaction.l2Token
-    );
+    const bridgeTokenType = getBridgeTokenType(transaction.l1Token);
     setTransaction((prev) => ({ ...prev, bridgeTokenType }));
   }, [transaction.l1Token, transaction.l2Token, setTransaction]);
 
