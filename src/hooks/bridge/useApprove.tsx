@@ -13,7 +13,6 @@ export const useApprove = (
     if (transaction.bridgeTokenType === BridgeTokenEnum.ETH) return;
     setIsApproving(true);
     try {
-      console.log(transaction.l1Token, transaction.l2Token);
       const response =
         transaction.bridgeTokenType === BridgeTokenEnum.NATIVE_TOKEN
           ? await crossChainMessenger.approveNativeToken(
