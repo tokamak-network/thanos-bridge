@@ -14,12 +14,12 @@ export const TokenSelectionComponent: React.FC<
     <Button
       px={"8px"}
       py={"2px"}
-      bgColor={"#101217"}
+      bgColor={"transparent"}
       borderRadius={"8px"}
       alignItems={"center"}
       gap={"8px"}
       onClick={onClick}
-      _hover={{ bgColor: "#25282F" }}
+      _hover={{ bgColor: "#101217" }}
     >
       <TokenSymbolComponent tokenSymbol={tokenSymbol} width={25} height={25} />
       <Text fontSize={"20px"} fontWeight={500} lineHeight={"normal"}>

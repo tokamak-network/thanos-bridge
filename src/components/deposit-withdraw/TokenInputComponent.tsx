@@ -25,6 +25,8 @@ export const MaxBalanceButtonComponent: React.FC<ButtonProps> = (props) => {
       py={"2px"}
       justifyContent={"center"}
       color={"#0070ED"}
+      bgColor={"#000710"}
+      _hover={{ bgColor: "#101217" }}
       borderRadius={"6px"}
       fontSize={"12px"}
       fontWeight={600}
