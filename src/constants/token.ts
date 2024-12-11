@@ -1,5 +1,6 @@
 import { Token } from "@/types/token";
 import { l1Chain, l2Chain } from "@/config/network";
+import { L2_USDC_ADDRESS } from "./contract";
 export const supportedTokens: Token[] = [
   {
     chainId: l1Chain.id,
@@ -72,7 +73,7 @@ export const supportedTokens: Token[] = [
     name: "USDC",
     symbol: "USDC",
     decimals: 6,
-    address: "0x4200000000000000000000000000000000000778",
+    address: L2_USDC_ADDRESS,
     bridgedTokenSymbol: "usdc",
   },
 ];

@@ -32,7 +32,6 @@ export const DepositWithdrawConfirmModal: React.FC<{
       onEscapeKeyDown={() => setIsOpen(false)}
       onInteractOutside={() => setIsOpen(false)}
       onExitComplete={() => setIsOpen(false)}
-      onFocusOutside={() => setIsOpen(false)}
     >
       <DialogTrigger></DialogTrigger>
       <DialogContent

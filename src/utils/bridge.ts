@@ -5,13 +5,17 @@ import {
 } from "@/types/bridge";
 import { Token } from "@/types/token";
 
-export const getBridgeTokenType = (
-  l1Token: Token,
-  l2Token: Token
-): BridgeTokenEnum => {
-  if (!l1Token.address) return BridgeTokenEnum.ETH;
-  if (!l2Token.address) return BridgeTokenEnum.NATIVE_TOKEN;
-  return BridgeTokenEnum.ERC_20;
+export const getBridgeTokenType = (token: Token): BridgeTokenEnum => {
+  switch (token.bridgedTokenSymbol) {
+    case "eth":
+      return BridgeTokenEnum.ETH;
+    case "native":
+      return BridgeTokenEnum.NATIVE_TOKEN;
+    case "usdc":
+      return BridgeTokenEnum.USDC;
+    default:
+      return BridgeTokenEnum.ERC_20;
+  }
 };
 
 export const getBridgeToken = (transaction: BridgeTransactionInfo) => {

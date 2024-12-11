@@ -58,7 +58,7 @@ export const useWithdraw = () => {
           handleChangeTransactionState(TransactionStatusEnum.ERROR);
         }
         break;
-      case BridgeTokenEnum.ERC_20:
+      default:
         try {
           if (!crossChainMessenger) return;
           handleChangeTransactionState(TransactionStatusEnum.READY_TO_CONFIRM);
@@ -82,8 +82,6 @@ export const useWithdraw = () => {
           handleChangeTransactionState(TransactionStatusEnum.ERROR);
         }
         break;
-      default:
-        return;
     }
   };
 

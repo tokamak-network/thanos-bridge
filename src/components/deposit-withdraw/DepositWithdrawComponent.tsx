@@ -19,7 +19,7 @@ import { TokenInputComponent } from "./TokenInputComponent";
 import { getParsedAmount } from "@/utils/token-balance";
 import { ReceiveAmountComponent } from "./ReceiveAmountComponent";
 import { getBridgeToken, isValidTxHash } from "@/utils/bridge";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DepositWithdrawConfirmModal } from "./confirm-modal/DepositWithdrawConfirmModal";
 import { useDeposit } from "@/hooks/bridge/useDeposit";
 import { TransactionStatusEnum } from "@/types/transaction";
@@ -42,17 +42,27 @@ export const DepositWithdrawComponent: React.FC = () => {
   const { switchToL1, switchToL2 } = useNetwork();
   const { deposit } = useDeposit();
   const { withdraw, prove, finalize } = useWithdraw();
-  const { approve } = useApprove(setIsApproving, setIsApproved);
+  const { approve, approveUSDC } = useApprove(setIsApproving, setIsApproved);
   const { isConnected } = useWalletConnect();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [isInsufficient] = useAtom(jotaiIsInsufficient);
   const isAvailableToBridge =
     transaction.formatted !== "" && getParsedAmount(transaction.formatted, 18);
-  const needToApprove =
-    transaction.mode === BridgeModeEnum.DEPOSIT &&
-    transaction.bridgeTokenType !== BridgeTokenEnum.ETH;
+  const needToApprove = useMemo(() => {
+    return (
+      (transaction.mode === BridgeModeEnum.DEPOSIT &&
+        transaction.bridgeTokenType !== BridgeTokenEnum.ETH) ||
+      (transaction.mode === BridgeModeEnum.WITHDRAW &&
+        transaction.bridgeTokenType === BridgeTokenEnum.USDC)
+    );
+  }, [transaction.mode, transaction.bridgeTokenType]);
   useEffect(() => {
     if (transaction.bridgeTokenType === BridgeTokenEnum.ETH)
+      setIsApproved(true);
+    else if (
+      transaction.mode === BridgeModeEnum.WITHDRAW &&
+      transaction.bridgeTokenType !== BridgeTokenEnum.USDC
+    )
       setIsApproved(true);
     else setIsApproved(false);
   }, [transaction, setIsApproved]);
@@ -107,7 +117,12 @@ export const DepositWithdrawComponent: React.FC = () => {
       await withdraw(transaction, handleTransactionStateChange, setIsApproved);
   };
   const handleApprove = async () => {
-    await approve(transaction);
+    if (
+      transaction.mode === BridgeModeEnum.WITHDRAW &&
+      transaction.bridgeTokenType === BridgeTokenEnum.USDC
+    )
+      await approveUSDC(transaction.amount);
+    else await approve(transaction);
   };
   const handleProveTransaction = async () => {
     await prove(initiateTxHash, handleTransactionStateChange);
@@ -171,6 +186,7 @@ export const DepositWithdrawComponent: React.FC = () => {
         )}
       {transaction.mode === BridgeModeEnum.WITHDRAW &&
         transaction.step === BridgingStepEnum.INITIATE &&
+        isApproved &&
         isConnected && (
           <BigButtonComponent
             disabled={!isAvailableToBridge || isInsufficient}
