@@ -1,11 +1,3 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "typescript"
-  ],
-  "rules": {
-    "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/no-empty-object-type": "off",
-    "@typescript-eslint/no-require-imports": "off"
-  }
+  "extends": ["next/core-web-vitals", "next/typescript"]
 }
