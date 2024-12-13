@@ -34,7 +34,8 @@ const ConnectedNetworkComponent: React.FC = () => {
           bgColor={"#101217"}
           borderRadius={"8px"}
           border={"1px solid #25282F"}
-          _hover={{ bgColor: "#25282F" }}
+          _hover={{ border: "1px solid #555A64" }}
+          height={"46px"}
           fontWeight={500}
           fontSize={"16px"}
           lineHeight={"24px"}

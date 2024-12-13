@@ -17,12 +17,19 @@ import { ArrowRightIconComponent } from "../icons/ArrowRight";
 
 export const FromToNetworkComponent: React.FC = () => {
   const [transaction] = useAtom(jotaiBridgeTransactionInfo);
-  const { switchChain } = useNetwork();
+  const { switchChain, switchToL1, switchToL2 } = useNetwork();
   const handleSelectFromNetwork = async (chainId: number) => {
     switchChain(chainId);
   };
   const handleSelectToNetwork = async (chainId: number) => {
     switchChain(chainId === l1Chain.id ? l2Chain.id : l1Chain.id);
+  };
+  const handleSwitchToDifferentChain = async () => {
+    if (transaction.fromChain.id === l1Chain.id) {
+      await switchToL2();
+    } else {
+      await switchToL1();
+    }
   };
   return (
     <Flex gap={"6px"} alignItems={"flex-end"}>
@@ -30,7 +37,6 @@ export const FromToNetworkComponent: React.FC = () => {
         flexDir={"column"}
         gap={"6px"}
         justifyContent={"flex-start"}
-        bgColor={"1D1F25"}
         width={"192px"}
       >
         <Text
@@ -44,11 +50,13 @@ export const FromToNetworkComponent: React.FC = () => {
         <MenuRoot>
           <MenuTrigger asChild>
             <Button
+              width={"192px"}
+              height={"44px"}
               px={"12px"}
               py={"10px"}
+              bgColor={"#1D1F25"}
               borderRadius={"6px"}
-              border={"1px solid #25282F"}
-              _hover={{ bgColor: "#25282F" }}
+              _hover={{ border: "1px solid #555A64" }}
             >
               <Flex
                 alignItems={"center"}
@@ -95,9 +103,12 @@ export const FromToNetworkComponent: React.FC = () => {
         </MenuRoot>
       </Flex>
       <Button
-        bgColor={"1D1F25"}
+        width={"44px"}
+        height={"44px"}
         borderRadius={"6px"}
-        border={"1px solid #25282F"}
+        bgColor={"#1D1F25"}
+        _hover={{ border: "1px solid #555A64" }}
+        onClick={handleSwitchToDifferentChain}
       >
         <ArrowRightIconComponent />
       </Button>
@@ -105,7 +116,6 @@ export const FromToNetworkComponent: React.FC = () => {
         flexDir={"column"}
         gap={"6px"}
         justifyContent={"flex-start"}
-        bgColor={"1D1F25"}
         width={"192px"}
       >
         <Text
@@ -119,11 +129,13 @@ export const FromToNetworkComponent: React.FC = () => {
         <MenuRoot>
           <MenuTrigger asChild>
             <Button
+              width={"192px"}
+              height={"44px"}
               px={"12px"}
               py={"10px"}
               borderRadius={"6px"}
-              border={"1px solid #25282F"}
-              _hover={{ bgColor: "#25282F" }}
+              bgColor={"#1D1F25"}
+              _hover={{ border: "1px solid #555A64" }}
             >
               <Flex
                 alignItems={"center"}

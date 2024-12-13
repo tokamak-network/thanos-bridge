@@ -87,6 +87,9 @@ export const DepositWithdrawConfirmModal: React.FC<{
                 ? "Deposit"
                 : "Withdraw"
             }
+            style={{
+              height: "48px",
+            }}
           />
         </DialogFooter>
       </DialogContent>

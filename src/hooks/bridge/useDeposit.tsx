@@ -22,7 +22,7 @@ export const useDeposit = () => {
           const response = await crossChainMessenger.bridgeETH(
             transaction.amount.toString(),
             {
-              recipient: transaction.toAddress,
+              recipient: transaction.toAddress || undefined,
             }
           );
           handleChangeTransactionState(TransactionStatusEnum.CONFIRMING);
@@ -43,7 +43,7 @@ export const useDeposit = () => {
           const response = await crossChainMessenger.bridgeNativeToken(
             transaction.amount.toString(),
             {
-              recipient: transaction.toAddress,
+              recipient: transaction.toAddress || undefined,
             }
           );
           handleChangeTransactionState(TransactionStatusEnum.CONFIRMING);
@@ -67,7 +67,7 @@ export const useDeposit = () => {
             transaction.l2Token?.address as AddressLike,
             transaction.amount.toString(),
             {
-              recipient: transaction.toAddress,
+              recipient: transaction.toAddress || undefined,
             }
           );
           handleChangeTransactionState(TransactionStatusEnum.CONFIRMING);

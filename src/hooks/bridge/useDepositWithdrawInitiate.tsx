@@ -57,7 +57,7 @@ export const useDepositWithdrawInitiate = () => {
     setTransaction((prev) => ({
       ...prev,
       fromAddress: address as `0x${string}`,
-      toAddress: address as `0x${string}`,
+      toAddress: "",
     }));
   }, [isConnected, address, setTransaction]);
 

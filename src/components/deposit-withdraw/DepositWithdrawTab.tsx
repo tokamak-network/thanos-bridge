@@ -27,6 +27,7 @@ export const DepositWithdrawTabComponent: React.FC = () => {
       height={"48px"}
       borderRadius={"32px"}
       border={"1px solid #25282F"}
+      _hover={{ border: "1px solid #555A64" }}
       justifyContent={"center"}
       alignItems={"center"}
     >
@@ -37,6 +38,10 @@ export const DepositWithdrawTabComponent: React.FC = () => {
         color={
           transaction.mode === BridgeModeEnum.DEPOSIT ? "#0070ED" : "#8C8F97"
         }
+        _hover={{
+          color:
+            transaction.mode === BridgeModeEnum.DEPOSIT ? "#0070ED" : "#BBBEC6",
+        }}
         fontWeight={500}
         lineHeight={"normal"}
         borderRadius={"32px"}
@@ -63,6 +68,12 @@ export const DepositWithdrawTabComponent: React.FC = () => {
             ? "1px solid #0070ED"
             : ""
         }
+        _hover={{
+          color:
+            transaction.mode === BridgeModeEnum.WITHDRAW
+              ? "#0070ED"
+              : "#BBBEC6",
+        }}
         height={"100%"}
         onClick={() => handleClick(BridgeModeEnum.WITHDRAW)}
       >

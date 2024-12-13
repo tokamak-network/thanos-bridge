@@ -31,7 +31,7 @@ export const TokenInfoComponent: React.FC<ITokenInfoComponentProps> = ({
   }, [token, setBalance, address]);
   return (
     <Button
-      width={"100%"}
+      width={"372px"}
       alignItems={"center"}
       justifyContent={"space-between"}
       bgColor={"#25282F"}

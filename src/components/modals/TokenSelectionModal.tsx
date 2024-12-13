@@ -55,6 +55,7 @@ export const TokenSelectionModalComponent = () => {
     >
       <DialogTrigger></DialogTrigger>
       <DialogContent
+        w={"420px"}
         bgColor={"#101217"}
         padding={"24px"}
         borderRadius={"22px"}

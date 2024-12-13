@@ -16,7 +16,9 @@ export const ProveFinalizeWithdrawalComponent: React.FC<
       <Input
         bgColor={"#1D1F25"}
         borderRadius={"6px"}
-        border={`1px solid ${isValid ? "#555A64" : "#DD3A44"}`}
+        _hover={{ border: "1px solid #555A64" }}
+        _focus={{ border: "1px solid transparent" }}
+        border={!isValid ? "1px solid #DD3A44" : "1px solid transparent"}
         padding={"0px 12px 0px 16px"}
         placeholder={"0x012346ac7A6702Bb1852676f3f22AeE38bD442E4C"}
         fontSize={"16px"}

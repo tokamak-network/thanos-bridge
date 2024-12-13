@@ -1,13 +1,12 @@
 "use client";
 
 import { Flex, Text } from "@chakra-ui/react";
-import { usePathname, useRouter } from "next/navigation";
 import { ConnectedNetworkAccount } from "../network/ConnectedNetworkAccount";
 import dynamic from "next/dynamic";
+import LogoIcon from "@/assets/icons/logo.svg";
+import Image from "next/image";
 
 const GNBComponentInner = () => {
-  const router = useRouter();
-  const pathName = usePathname();
   return (
     <Flex
       height={"80px"}
@@ -17,27 +16,20 @@ const GNBComponentInner = () => {
       px={"32px"}
       py={"20px"}
     >
-      <Flex gap={"48px"}>
-        <Text
-          fontSize={"16px"}
-          fontWeight={500}
-          lineHeight={"24px"}
-          cursor={"pointer"}
-          color={pathName.includes("bridge") ? "#FFFFFF" : "#8C8F97"}
-          onClick={() => router.push("/bridge")}
-        >
-          Bridge
-        </Text>
-        <Text
-          fontSize={"16px"}
-          fontWeight={500}
-          lineHeight={"24px"}
-          cursor={"pointer"}
-          color={pathName.includes("account") ? "#FFFFFF" : "#8C8F97"}
-          onClick={() => router.push("/account")}
-        >
-          Account
-        </Text>
+      <Flex position={"absolute"} left={"32px"} top={"20px"}>
+        <Flex px="16px" py="8px" gap={"8px"}>
+          <Flex>
+            <Image src={LogoIcon} alt="logo" width={20} height={20} />
+          </Flex>
+          <Text
+            fontSize={"16px"}
+            fontWeight={500}
+            lineHeight={"24px"}
+            color={"#FFFFFF"}
+          >
+            Bridge
+          </Text>
+        </Flex>
       </Flex>
       <Flex position={"absolute"} right={"32px"} top={"20px"}>
         <ConnectedNetworkAccount />

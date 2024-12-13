@@ -1,4 +1,5 @@
 import { TokenSymbolComponent } from "@/components/icons/TokenSymbol";
+import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
 import { BridgeTransactionInfo } from "@/types/bridge";
 import { trimAddress } from "@/utils/address";
 import { trimTokenBalance } from "@/utils/token-balance";
@@ -11,6 +12,7 @@ interface ITransactionDetailComponentProps {
 export const TransactionDetailComponent: React.FC<
   ITransactionDetailComponentProps
 > = ({ transaction }) => {
+  const { address } = useWalletConnect();
   return (
     <Flex flexDir={"column"} gap={"8px"}>
       <Flex
@@ -85,7 +87,10 @@ export const TransactionDetailComponent: React.FC<
             To address
           </Text>
           <Text fontSize={"16px"} fontWeight={600} lineHeight={"24px"}>
-            {trimAddress({ address: transaction.toAddress, firstChar: 7 })}
+            {trimAddress({
+              address: transaction.toAddress || address,
+              firstChar: 7,
+            })}
           </Text>
         </Flex>
       </Flex>
