@@ -163,7 +163,7 @@ export const DepositWithdrawComponent: React.FC = () => {
                 tokenSymbol={getBridgeToken(transaction)?.symbol ?? ""}
               />
             )}
-            <ToAddressComponent />
+            {isConnected && <ToAddressComponent />}
           </>
         )}
       </Flex>

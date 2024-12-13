@@ -76,17 +76,21 @@ export const TokenInputComponent: React.FC = () => {
         You send
       </Text>
       <Flex
+        width={"440px"}
+        height={"96px"}
         p={"16px 12px 11.5px 20px"}
         bgColor={"#1D1F25"}
         borderRadius={"6px"}
         flexDir={"column"}
+        border={"1px solid transparent"}
+        _hover={{ border: "1px solid #555A64" }}
       >
         <Flex alignItems={"center"}>
           <Input
             width={"100%"}
             height={"48px"}
             borderRadius={"6px"}
-            bgColor={"1D1F25"}
+            bgColor={"#1D1F25"}
             fontSize={"32px"}
             fontWeight={500}
             lineHeight={"normal"}

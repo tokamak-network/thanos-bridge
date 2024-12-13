@@ -27,21 +27,25 @@ export const ToAddressComponent: React.FC = () => {
     );
   }, [address, transaction.toAddress, isConnected]);
   return (
-    <Flex gap={"6px"} flexDir={"column"}>
+    <Flex gap={"6px"} flexDir={"column"} width={"440px"}>
       <Text color={"#8C8F97"} fontWeight={400}>
         To address
       </Text>
       <Input
+        width={"100%"}
+        height={"44px"}
         fontSize={"16px"}
-        px={"16px"}
+        px={"12px"}
         py={"10px"}
         borderRadius={"6px"}
-        bgColor={"1D1F25"}
-        placeholder="0x012346ac7A6702Bb1852676f3f22AeE38bD442E4C"
+        bgColor={"#1D1F25"}
+        placeholder={address}
+        _hover={{ border: "1px solid #555A64" }}
+        _focus={{ border: "1px solid transparent" }}
         border={
           !isValid && transaction.toAddress
             ? "1px solid #DD3A44"
-            : "1px solid #25282F"
+            : "1px solid transparent"
         }
         onChange={handleChange}
         value={transaction.toAddress}

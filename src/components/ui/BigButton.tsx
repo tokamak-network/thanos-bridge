@@ -12,16 +12,18 @@ export const BigButtonComponent: React.FC<IBigButtonComponentProps> = ({
   const { disabled, content, onClick, isLoading } = props;
   return (
     <Button
-      py={"16px"}
-      bgColor={disabled || isLoading ? "#25282F" : "#0070ED"}
+      py={"12px"}
+      bgColor={disabled || isLoading ? "#4E5055" : "#0070ED"}
       width={"100%"}
-      height={"24px"}
+      style={{
+        height: "56px",
+        ...props.style,
+      }}
       borderRadius={"12px"}
       fontSize={"16px"}
       fontWeight={600}
       lineHeight={"normal"}
-      color={disabled ? "#BBBEC6" : "#FFFFFF"}
-      boxSizing={"content-box"}
+      color={isLoading ? "#25282F" : disabled ? "#BBBEC6" : "#FFFFFF"}
       disabled={disabled || isLoading}
       onClick={onClick}
     >
