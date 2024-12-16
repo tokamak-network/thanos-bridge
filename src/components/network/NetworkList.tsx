@@ -39,7 +39,7 @@ export const NetworkListComponent: React.FC<INetworkListComponentProps> = ({
           }}
           value={chain.name}
           width={"192px"}
-          height={"32px"}
+          height={"40px"}
           px={"12px"}
           py={"6px"}
           fontSize={"14px"}

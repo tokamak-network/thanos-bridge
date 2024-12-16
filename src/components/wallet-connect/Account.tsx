@@ -83,7 +83,7 @@ export const Account = () => {
         <MenuItem
           value="Copy"
           width={"192px"}
-          height={"32px"}
+          height={"40px"}
           px={"12px"}
           py={"6px"}
           fontSize={"14px"}
@@ -106,7 +106,7 @@ export const Account = () => {
         <MenuItem
           value="Disconnect"
           width={"192px"}
-          height={"32px"}
+          height={"40px"}
           px={"12px"}
           py={"6px"}
           bgColor={"transparent"}
