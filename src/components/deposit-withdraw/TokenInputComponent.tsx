@@ -103,7 +103,7 @@ export const TokenInputComponent: React.FC = () => {
           <TokenSelectionComponent
             tokenSymbol={getBridgeToken(transaction)?.symbol ?? ""}
             onClick={() => {
-              if (isConnected) setIsTokenSelectModalOpen(true);
+              setIsTokenSelectModalOpen(true);
             }}
           />
         </Flex>

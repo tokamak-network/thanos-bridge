@@ -38,9 +38,10 @@ export const NetworkListComponent: React.FC<INetworkListComponentProps> = ({
             await onSelectNetwork(chain.id);
           }}
           value={chain.name}
-          width={"100%"}
+          width={"192px"}
+          height={"32px"}
           px={"12px"}
-          py={"5.5px"}
+          py={"6px"}
           fontSize={"14px"}
           fontWeight={500}
           bgColor={"transparent"}
