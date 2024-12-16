@@ -19,8 +19,9 @@ export const TokenInfoComponent: React.FC<ITokenInfoComponentProps> = ({
   onClick,
 }) => {
   const [balance, setBalance] = useState<TokenBalance | null>(null);
-  const { address } = useWalletConnect();
+  const { address, isConnected } = useWalletConnect();
   useEffect(() => {
+    if (!isConnected) return;
     getTokenBalanceByChainId(
       address as `0x${string}`,
       token.chainId,
@@ -28,7 +29,7 @@ export const TokenInfoComponent: React.FC<ITokenInfoComponentProps> = ({
     ).then((balance) => {
       setBalance(balance);
     });
-  }, [token, setBalance, address]);
+  }, [token, setBalance, address, isConnected]);
   return (
     <Button
       width={"372px"}
