@@ -1,6 +1,7 @@
 import { Token } from "@/types/token";
 import { l1Chain, l2Chain } from "@/config/network";
 import { L2_USDC_ADDRESS } from "./contract";
+import { env } from "next-runtime-env";
 export const supportedTokens: Token[] = [
   {
     chainId: l1Chain.id,
@@ -25,9 +26,7 @@ export const supportedTokens: Token[] = [
     name: "Native Token",
     symbol: "NativeToken",
     decimals: 18,
-    address:
-      (process.env.NEXT_PUBLIC_NATIVE_TOKEN_L1_ADDRESS as `0x${string}`) ||
-      "0x",
+    address: env("NEXT_PUBLIC_NATIVE_TOKEN_L1_ADDRESS") as `0x${string}`,
     bridgedTokenSymbol: "native",
   },
   {
@@ -44,7 +43,7 @@ export const supportedTokens: Token[] = [
     name: "Tether USD",
     symbol: "USDT",
     decimals: 6,
-    address: process.env.NEXT_PUBLIC_L1_USDT_ADDRESS as `0x${string}`,
+    address: env("NEXT_PUBLIC_L1_USDT_ADDRESS") as `0x${string}`,
     bridgedTokenSymbol: "usdt",
   },
   {
@@ -53,7 +52,7 @@ export const supportedTokens: Token[] = [
     name: "USDT",
     symbol: "USDT",
     decimals: 6,
-    address: process.env.NEXT_PUBLIC_L2_USDT_ADDRESS as `0x${string}`,
+    address: env("NEXT_PUBLIC_L2_USDT_ADDRESS") as `0x${string}`,
     bridgedTokenSymbol: "usdt",
   },
   {
@@ -62,9 +61,7 @@ export const supportedTokens: Token[] = [
     name: "USDC",
     symbol: "USDC",
     decimals: 6,
-    address:
-      (process.env.NEXT_PUBLIC_L1_USDC_ADDRESS as `0x${string}`) ||
-      "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+    address: env("NEXT_PUBLIC_L1_USDC_ADDRESS") as `0x${string}`,
     bridgedTokenSymbol: "usdc",
   },
   {

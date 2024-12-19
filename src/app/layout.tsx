@@ -4,6 +4,7 @@ import { Flex } from "@chakra-ui/react";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Modal } from "@/components/modals/Modal";
+import { PublicEnvScript } from "next-runtime-env";
 
 export default function RootLayout({
   children,
@@ -13,6 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <PublicEnvScript />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body>
