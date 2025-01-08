@@ -1,4 +1,4 @@
-import { BridgeModeEnum, BridgeTransactionInfo } from "@/types/bridge";
+import { BridgeModeEnum } from "@/types/bridge";
 import { Flex } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { Button } from "../ui/button";

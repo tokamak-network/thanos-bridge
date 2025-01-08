@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Flex, Text } from "@chakra-ui/react";
+import { Text } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { jotaiInvalidRPCWarningModalOpen } from "@/jotai/bridge";
 import { CloseIconComponent } from "../icons/Close";
@@ -59,7 +59,7 @@ export const InvalidRPCWarningModalComponent = () => {
         </DialogHeader>
         <DialogBody>
           <Text fontSize={"14px"} fontWeight={"400"} color={"#E5E5E5"}>
-            You can't switch the chain in this app since the RPC URL is not
+            You can&apos;t switch the chain in this app since the RPC URL is not
             secure. Please try to switch network via your wallet.{" "}
             <u>Read about it more here.</u>
           </Text>
