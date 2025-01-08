@@ -13,3 +13,13 @@ export const getChainById = (chainId: number): Chain => {
   if (chainId === l2Chain.id) return l2Chain;
   return l1Chain;
 };
+
+export const isHTTPS = (url: string) => {
+  return url.startsWith("https://");
+};
+
+export const getRPCUrlFromChainId = (chainId: number) => {
+  if (chainId === l1Chain.id) return l1Chain.rpcUrls.default.http[0];
+  if (chainId === l2Chain.id) return l2Chain.rpcUrls.default.http[0];
+  return l1Chain.rpcUrls.default.http[0];
+};

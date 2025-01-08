@@ -32,3 +32,9 @@ export interface BridgeTransactionInfo {
   l1Token?: Token;
   l2Token?: Token;
 }
+
+export interface GeneralWarningModalProps {
+  isOpen: boolean;
+  title: string;
+  description: string;
+}

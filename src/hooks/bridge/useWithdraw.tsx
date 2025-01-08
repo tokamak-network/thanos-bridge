@@ -3,9 +3,13 @@ import { useThanosSDK } from "./useThanosSDK";
 import { l1Chain, l2Chain } from "@/config/network";
 import { TransactionStatusEnum } from "@/types/transaction";
 import { AddressLike } from "@tokamak-network/thanos-sdk";
+import { useAtom } from "jotai";
+import { jotaiGeneralWarningModal } from "@/jotai/bridge";
+import { downloadTxHash } from "@/utils/bridge";
 
 export const useWithdraw = () => {
   const { crossChainMessenger } = useThanosSDK(l1Chain.id, l2Chain.id);
+  const [, setGeneralWarningModal] = useAtom(jotaiGeneralWarningModal);
   const withdraw = async (
     transaction: BridgeTransactionInfo,
     handleChangeTransactionState: (
@@ -27,6 +31,15 @@ export const useWithdraw = () => {
           );
           handleChangeTransactionState(TransactionStatusEnum.CONFIRMING);
           const depositTx = await response.wait();
+          downloadTxHash(
+            l1Chain.name,
+            l1Chain.id,
+            l2Chain.name,
+            l2Chain.id,
+            transaction.l1Token?.name || "",
+            transaction.formatted,
+            depositTx.transactionHash
+          );
           handleChangeTransactionState(
             TransactionStatusEnum.SUCCESS,
             depositTx.transactionHash
@@ -52,6 +65,15 @@ export const useWithdraw = () => {
             TransactionStatusEnum.SUCCESS,
             depositTx.transactionHash
           );
+          downloadTxHash(
+            l1Chain.name,
+            l1Chain.id,
+            l2Chain.name,
+            l2Chain.id,
+            transaction.l1Token?.name || "",
+            transaction.formatted,
+            depositTx.transactionHash
+          );
           setIsApproved(false);
         } catch (error) {
           console.error(error);
@@ -74,6 +96,15 @@ export const useWithdraw = () => {
           const depositTx = await response.wait();
           handleChangeTransactionState(
             TransactionStatusEnum.SUCCESS,
+            depositTx.transactionHash
+          );
+          downloadTxHash(
+            l1Chain.name,
+            l1Chain.id,
+            l2Chain.name,
+            l2Chain.id,
+            transaction.l1Token?.name || "",
+            transaction.formatted,
             depositTx.transactionHash
           );
           setIsApproved(false);
@@ -104,6 +135,12 @@ export const useWithdraw = () => {
       );
     } catch (error) {
       console.error(error);
+      setGeneralWarningModal({
+        isOpen: true,
+        title: "Prove Error",
+        description:
+          "The transaction is not ready to prove yet or the hash is not correct.",
+      });
       handleChangeTransactionState(TransactionStatusEnum.ERROR);
     }
   };
@@ -127,6 +164,12 @@ export const useWithdraw = () => {
       );
     } catch (error) {
       console.error(error);
+      setGeneralWarningModal({
+        isOpen: true,
+        title: "Finalize Error",
+        description:
+          "The transaction is not ready to finalize yet or the hash is not correct.",
+      });
       handleChangeTransactionState(TransactionStatusEnum.ERROR);
     }
   };
