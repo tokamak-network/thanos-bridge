@@ -40,10 +40,8 @@ export const l2Chain: Chain = {
   },
   blockExplorers: {
     default: {
-      name: env("NEXT_PUBLIC_L2_BLOCK_EXPLORER") || "Titan Sepolia Explorer",
-      url:
-        env("NEXT_PUBLIC_L2_BLOCK_EXPLORER") ||
-        "https://explorer.titan-sepolia.tokamak.network",
+      name: env("NEXT_PUBLIC_L2_BLOCK_EXPLORER") || "Block Explorer",
+      url: env("NEXT_PUBLIC_L2_BLOCK_EXPLORER") || "",
     },
   },
 };

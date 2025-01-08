@@ -35,7 +35,7 @@ export const Account = () => {
   return (
     <MenuRoot>
       {isConnected ? (
-        <MenuTrigger>
+        <MenuTrigger asChild>
           <Button
             px={"12px"}
             py={"8px"}

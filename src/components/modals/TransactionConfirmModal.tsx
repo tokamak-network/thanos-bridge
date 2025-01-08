@@ -18,6 +18,45 @@ import { TransactionFailedIconComponent } from "../icons/TransactionFailed";
 import Link from "next/link";
 import { l1Chain, l2Chain } from "@/config/network";
 import { BridgeModeEnum } from "@/types/bridge";
+
+const TransactionHashDetailComponent: React.FC<{
+  txHash: string;
+  blockExplorerURL: string;
+}> = ({ txHash, blockExplorerURL }) => {
+  return blockExplorerURL ? (
+    <Link href={`${blockExplorerURL}/tx/${txHash}`} target="_blank">
+      <Text
+        fontSize={"14px"}
+        fontWeight={"500"}
+        lineHeight={"26px"}
+        textAlign={"center"}
+        mt={"175px"}
+        justifyContent={"center"}
+        textDecoration={"underline"}
+        cursor={"pointer"}
+      >
+        See your transaction history
+      </Text>
+    </Link>
+  ) : (
+    <Text
+      fontSize={"14px"}
+      fontWeight={"500"}
+      lineHeight={"26px"}
+      textAlign={"center"}
+      mt={"175px"}
+      justifyContent={"center"}
+      textDecoration={"underline"}
+      cursor={"pointer"}
+      onClick={() => {
+        navigator.clipboard.writeText(txHash);
+      }}
+    >
+      Copy Transaction Hash
+    </Text>
+  );
+};
+
 export const TransactionConfirmModalComponent: React.FC = () => {
   const [transactionConfirmModalStatus, setTransactionConfirmModalStatus] =
     useAtom(jotaiTransactionConfirmModalStatus);
@@ -86,22 +125,10 @@ export const TransactionConfirmModalComponent: React.FC = () => {
 
           {transactionConfirmModalStatus.status ===
           TransactionStatusEnum.SUCCESS ? (
-            <Link
-              href={`${blockExplorerURL}/tx/${transactionConfirmModalStatus.txHash}`}
-              target="_blank"
-            >
-              <Text
-                fontSize={"14px"}
-                fontWeight={"500"}
-                lineHeight={"26px"}
-                textAlign={"center"}
-                mt={"175px"}
-                justifyContent={"center"}
-                textDecoration={"underline"}
-              >
-                See your transaction history
-              </Text>
-            </Link>
+            <TransactionHashDetailComponent
+              txHash={transactionConfirmModalStatus.txHash || ""}
+              blockExplorerURL={blockExplorerURL || ""}
+            />
           ) : (
             <Text
               fontSize={"14px"}

@@ -32,8 +32,8 @@ export const supportedTokens: Token[] = [
   {
     chainId: l2Chain.id,
     isNativeCurrency: true,
-    name: "Native Token",
-    symbol: "NativeToken",
+    name: l2Chain.nativeCurrency.name || "Native Token",
+    symbol: l2Chain.nativeCurrency.symbol || "Native Token",
     decimals: 18,
     bridgedTokenSymbol: "native",
   },

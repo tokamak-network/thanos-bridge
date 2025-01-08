@@ -4,6 +4,7 @@ import {
   BridgeTokenEnum,
   BridgeTransactionInfo,
   BridgingStepEnum,
+  GeneralWarningModalProps,
 } from "@/types/bridge";
 import { TransactionStatusEnum } from "@/types/transaction";
 import { TransactionConfirmModalProps } from "@/types/transaction";
@@ -22,6 +23,14 @@ export const jotaiBridgeTransactionInfo = atom<BridgeTransactionInfo>({
 });
 
 export const jotaiTokenSelectModalOpen = atom<boolean>(false);
+
+export const jotaiInvalidRPCWarningModalOpen = atom<boolean>(false);
+
+export const jotaiGeneralWarningModal = atom<GeneralWarningModalProps>({
+  isOpen: false,
+  title: "",
+  description: "",
+});
 
 export const jotaiIsInsufficient = atom<boolean>(false);
 

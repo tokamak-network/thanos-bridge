@@ -10,15 +10,16 @@ export const DepositWithdrawTabComponent: React.FC = () => {
   const { switchToL1, switchToL2 } = useNetwork();
   const handleClick = async (status: BridgeModeEnum) => {
     if (status === transaction.mode) return;
-    if (status === BridgeModeEnum.DEPOSIT) {
-      await switchToL1();
-    } else {
-      await switchToL2();
+    try {
+      if (status === BridgeModeEnum.DEPOSIT) {
+        await switchToL1();
+      } else {
+        await switchToL2();
+      }
+      setTransaction((prev) => ({ ...prev, mode: status }));
+    } catch (error) {
+      console.error(error);
     }
-    setTransaction((prev: BridgeTransactionInfo) => ({
-      ...prev,
-      mode: status,
-    }));
   };
 
   return (
