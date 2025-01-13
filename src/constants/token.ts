@@ -23,8 +23,8 @@ export const supportedTokens: Token[] = [
   {
     chainId: l1Chain.id,
     isNativeCurrency: false,
-    name: "Native Token",
-    symbol: "NativeToken",
+    name: l2Chain.nativeCurrency.name || "Native Token",
+    symbol: l2Chain.nativeCurrency.symbol || "Native Token",
     decimals: 18,
     address: env("NEXT_PUBLIC_NATIVE_TOKEN_L1_ADDRESS") as `0x${string}`,
     bridgedTokenSymbol: "native",
