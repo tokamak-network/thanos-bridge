@@ -62,3 +62,15 @@ This is a DApp which interacts with the Thanos chain where the users can bridge 
 | `NEXT_PUBLIC_L2_OUTPUT_ORACLE_ADDRESS`          | The address of the L2 output oracle contract                |
 | `NEXT_PUBLIC_L1_USDC_BRIDGE_ADDRESS`            | The address of the L1 USDC bridge contract                  |
 | `NEXT_PUBLIC_DISPUTE_GAME_FACTORY_ADDRESS`      | The address of the dispute game factory contract            |
+
+## High level architecture
+
+![alt text](./src/assets/readme/thanos-bridge-arch.png)
+
+## Code Diagram
+
+[Code Diagram](./thanos-bridge.codediagram)
+
+## Deployment
+
+Once the PR is merged to the `main` branch, the docker image is being pushed to [docker hub](https://hub.docker.com/repository/docker/tokamaknetwork/trh-op-bridge-app).
