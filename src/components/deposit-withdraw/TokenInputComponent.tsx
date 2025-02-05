@@ -87,6 +87,7 @@ export const TokenInputComponent: React.FC = () => {
       >
         <Flex alignItems={"center"}>
           <Input
+            truncate
             width={"100%"}
             height={"48px"}
             borderRadius={"6px"}
