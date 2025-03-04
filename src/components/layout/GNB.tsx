@@ -5,11 +5,13 @@ import { ConnectedNetworkAccount } from "../network/ConnectedNetworkAccount";
 import dynamic from "next/dynamic";
 import LogoIcon from "@/assets/icons/logo.svg";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { USER_GUIDE_URL } from "@/constants/urls";
 
 const GNBComponentInner = () => {
   const router = useRouter();
-
+  const pathname = usePathname();
   return (
     <Flex
       height={"80px"}
@@ -39,6 +41,35 @@ const GNBComponentInner = () => {
             Bridge
           </Text>
         </Flex>
+      </Flex>
+      <Flex gap={"40px"} alignItems={"center"}>
+        <Link href={USER_GUIDE_URL} target="_blank" rel="noopener noreferrer">
+          <Text
+            fontSize={"16px"}
+            fontWeight={500}
+            lineHeight={"24px"}
+            color={"#FFFFFF"}
+            cursor={"pointer"}
+            _hover={{
+              color: "#0070ED",
+            }}
+          >
+            User Guide
+          </Text>
+        </Link>
+        <Text
+          fontSize={"16px"}
+          fontWeight={500}
+          lineHeight={"24px"}
+          color={pathname === "/bridge-info" ? "#0070ED" : "#FFFFFF"}
+          cursor={"pointer"}
+          _hover={{
+            color: "#0070ED",
+          }}
+          onClick={() => router.push("/bridge-info")}
+        >
+          Bridge Info
+        </Text>
       </Flex>
       <Flex position={"absolute"} right={"32px"} top={"20px"}>
         <ConnectedNetworkAccount />

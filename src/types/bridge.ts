@@ -38,3 +38,9 @@ export interface GeneralWarningModalProps {
   title: string;
   description: string;
 }
+
+export enum BridgeInfoEnum {
+  L1_CHAIN_INFO = "L1 Chain Info",
+  L2_CHAIN_INFO = "L2 Chain Info",
+  L1_CONTRACT_ADDRESS = "L1 Contract Addresses",
+}
