@@ -27,7 +27,7 @@ export const ToAddressComponent: React.FC = () => {
     );
   }, [address, transaction.toAddress, isConnected]);
   return (
-    <Flex gap={"6px"} flexDir={"column"} width={"440px"}>
+    <Flex gap={"6px"} flexDir={"column"}>
       <Text color={"#8C8F97"} fontWeight={400}>
         To address
       </Text>

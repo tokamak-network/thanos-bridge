@@ -32,12 +32,17 @@ export const FromToNetworkComponent: React.FC = () => {
     }
   };
   return (
-    <Flex gap={"6px"} alignItems={"flex-end"}>
+    <Flex
+      gap={"6px"}
+      alignItems={"flex-end"}
+      width={"100%"}
+      justifyContent={"space-between"}
+    >
       <Flex
         flexDir={"column"}
         gap={"6px"}
         justifyContent={"flex-start"}
-        width={"192px"}
+        width={"100%"}
       >
         <Text
           fontSize={"14px"}
@@ -50,7 +55,6 @@ export const FromToNetworkComponent: React.FC = () => {
         <MenuRoot>
           <MenuTrigger asChild>
             <Button
-              width={"192px"}
               height={"44px"}
               px={"12px"}
               py={"10px"}
@@ -116,7 +120,7 @@ export const FromToNetworkComponent: React.FC = () => {
         flexDir={"column"}
         gap={"6px"}
         justifyContent={"flex-start"}
-        width={"192px"}
+        width={"100%"}
       >
         <Text
           fontSize={"14px"}
@@ -129,7 +133,6 @@ export const FromToNetworkComponent: React.FC = () => {
         <MenuRoot>
           <MenuTrigger asChild>
             <Button
-              width={"192px"}
               height={"44px"}
               px={"12px"}
               py={"10px"}

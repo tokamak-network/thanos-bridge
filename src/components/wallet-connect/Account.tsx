@@ -12,7 +12,6 @@ import {
   MenuRoot,
   MenuTrigger,
 } from "@/components/ui/menu";
-import { CopyAddressIconComponent } from "@/components/icons/CopyAddress";
 import { DisconnectIconComponent } from "@/components/icons/Disconnect";
 
 export const Account = () => {
@@ -80,29 +79,6 @@ export const Account = () => {
         bgColor={"#101217"}
         border={"1px solid #25282F"}
       >
-        <MenuItem
-          value="Copy"
-          width={"192px"}
-          height={"40px"}
-          px={"12px"}
-          py={"6px"}
-          fontSize={"14px"}
-          fontWeight={500}
-          bgColor={"transparent"}
-          _hover={{ bgColor: "#1D1F25" }}
-          justifyContent={"flex-start"}
-          color={"#FFFFFF"}
-          cursor={"pointer"}
-          gap={"8px"}
-          onClick={() => {
-            if (address) {
-              navigator.clipboard.writeText(address);
-            }
-          }}
-        >
-          <CopyAddressIconComponent width={20} height={20} />
-          Copy Address
-        </MenuItem>
         <MenuItem
           value="Disconnect"
           width={"192px"}

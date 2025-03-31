@@ -76,7 +76,6 @@ export const TokenInputComponent: React.FC = () => {
         You send
       </Text>
       <Flex
-        width={"440px"}
         height={"96px"}
         p={"16px 12px 11.5px 20px"}
         bgColor={"#1D1F25"}
