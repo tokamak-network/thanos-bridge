@@ -13,13 +13,7 @@ const BridgePageContent: React.FC = () => {
   useDepositWithdrawInitiate();
   return (
     <Flex w={"100%"} justifyContent={"center"}>
-      <Flex
-        w={"488px"}
-        mt={"48px"}
-        gap={"40px"}
-        flexDir={"column"}
-        alignItems={"center"}
-      >
+      <Flex mt={"48px"} gap={"40px"} flexDir={"column"} alignItems={"center"}>
         <DepositWithdrawTabComponent />
         <Flex gap={"32px"} width={"100%"} flexDir={"column"}>
           <DepositWithdrawComponent />
