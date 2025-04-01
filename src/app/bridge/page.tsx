@@ -15,7 +15,7 @@ const BridgePageContent: React.FC = () => {
     <Flex w={"100%"} justifyContent={"center"}>
       <Flex mt={"48px"} gap={"40px"} flexDir={"column"} alignItems={"center"}>
         <DepositWithdrawTabComponent />
-        <Flex gap={"32px"} width={"100%"} flexDir={"column"}>
+        <Flex gap={"32px"} width={"100%"} flexDir={"column"} minWidth={"500px"}>
           <DepositWithdrawComponent />
           {!isConnected && <WalletConnectButtonComponent />}
         </Flex>
