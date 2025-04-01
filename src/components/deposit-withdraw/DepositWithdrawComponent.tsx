@@ -53,9 +53,10 @@ export const DepositWithdrawComponent: React.FC = () => {
       (transaction.mode === BridgeModeEnum.DEPOSIT &&
         transaction.bridgeTokenType !== BridgeTokenEnum.ETH) ||
       (transaction.mode === BridgeModeEnum.WITHDRAW &&
+        transaction.step === BridgingStepEnum.INITIATE &&
         transaction.bridgeTokenType === BridgeTokenEnum.USDC)
     );
-  }, [transaction.mode, transaction.bridgeTokenType]);
+  }, [transaction.mode, transaction.bridgeTokenType, transaction.step]);
   useEffect(() => {
     if (transaction.bridgeTokenType === BridgeTokenEnum.ETH)
       setIsApproved(true);
