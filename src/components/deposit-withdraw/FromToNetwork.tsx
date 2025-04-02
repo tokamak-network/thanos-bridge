@@ -19,10 +19,18 @@ export const FromToNetworkComponent: React.FC = () => {
   const [transaction] = useAtom(jotaiBridgeTransactionInfo);
   const { switchChain, switchToL1, switchToL2 } = useNetwork();
   const handleSelectFromNetwork = async (chainId: number) => {
-    switchChain(chainId);
+    try {
+      await switchChain(chainId);
+    } catch (error) {
+      console.error(error);
+    }
   };
   const handleSelectToNetwork = async (chainId: number) => {
-    switchChain(chainId === l1Chain.id ? l2Chain.id : l1Chain.id);
+    try {
+      await switchChain(chainId === l1Chain.id ? l2Chain.id : l1Chain.id);
+    } catch (error) {
+      console.error(error);
+    }
   };
   const handleSwitchToDifferentChain = async () => {
     if (transaction.fromChain.id === l1Chain.id) {

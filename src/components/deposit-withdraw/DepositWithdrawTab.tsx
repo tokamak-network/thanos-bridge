@@ -16,7 +16,7 @@ export const DepositWithdrawTabComponent: React.FC = () => {
       } else {
         await switchToL2();
       }
-      setTransaction((prev) => ({ ...prev, mode: status }));
+      await setTransaction((prev) => ({ ...prev, mode: status }));
     } catch (error) {
       console.error(error);
     }

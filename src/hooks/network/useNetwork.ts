@@ -16,8 +16,7 @@ export const useNetwork = () => {
     const rpcUrl = getRPCUrlFromChainId(chainId);
     if (!isHTTPS(rpcUrl)) {
       await setInvalidRPCWarningModalOpen(true);
-      console.error("Invalid RPC URL", rpcUrl);
-      return;
+      throw new Error("Invalid RPC URL");
     }
     setGlobalLoading(true);
     try {
