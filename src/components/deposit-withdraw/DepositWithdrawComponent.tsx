@@ -99,12 +99,17 @@ export const DepositWithdrawComponent: React.FC = () => {
     if (transaction.mode === BridgeModeEnum.DEPOSIT) return;
     setInitiateTxHash("");
     setIsValidInitiateTxHash(false);
-    setTransaction((prev) => ({
-      ...prev,
-      step,
-    }));
-    if (step === BridgingStepEnum.INITIATE) await switchToL2();
-    else await switchToL1();
+    try {
+      if (step === BridgingStepEnum.INITIATE) await switchToL2();
+      else await switchToL1();
+      setTransaction((prev) => ({
+        ...prev,
+        mode: BridgeModeEnum.WITHDRAW,
+        step,
+      }));
+    } catch (error) {
+      console.error(error);
+    }
   };
   const handleBridge = async (transaction: BridgeTransactionInfo) => {
     setTransactionConfirmModalStatus((prev) => ({

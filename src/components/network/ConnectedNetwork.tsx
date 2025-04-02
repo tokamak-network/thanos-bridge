@@ -23,7 +23,11 @@ const ConnectedNetworkComponent: React.FC = () => {
   }, [chain]);
   const { switchChain } = useNetwork();
   const handleNetworkSelect = async (chainId: number) => {
-    if (isConnected) await switchChain(chainId);
+    try {
+      if (isConnected) await switchChain(chainId);
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <MenuRoot>
