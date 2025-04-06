@@ -33,10 +33,14 @@ export const FromToNetworkComponent: React.FC = () => {
     }
   };
   const handleSwitchToDifferentChain = async () => {
-    if (transaction.fromChain.id === l1Chain.id) {
-      await switchToL2();
-    } else {
-      await switchToL1();
+    try {
+      if (transaction.fromChain.id === l1Chain.id) {
+        await switchToL2();
+      } else {
+        await switchToL1();
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
   return (

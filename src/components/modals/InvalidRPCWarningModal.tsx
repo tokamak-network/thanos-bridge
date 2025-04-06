@@ -13,6 +13,8 @@ import { Text } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { jotaiInvalidRPCWarningModalOpen } from "@/jotai/bridge";
 import { CloseIconComponent } from "../icons/Close";
+import { INVALID_RPC_GUIDE_URL } from "@/constants/urls";
+import Link from "next/link";
 
 export const InvalidRPCWarningModalComponent = () => {
   const [isOpen, setIsOpen] = useAtom(jotaiInvalidRPCWarningModalOpen);
@@ -60,8 +62,14 @@ export const InvalidRPCWarningModalComponent = () => {
         <DialogBody>
           <Text fontSize={"14px"} fontWeight={"400"} color={"#E5E5E5"}>
             You can&apos;t switch the chain in this app since the RPC URL is not
-            secure. Please try to switch network via your wallet.{" "}
-            <u>Read about it more here.</u>
+            secure. Please try to switch network via your wallet. Read about it
+            more{" "}
+            <u>
+              <Link href={INVALID_RPC_GUIDE_URL} target="_blank">
+                here
+              </Link>
+            </u>
+            .
           </Text>
         </DialogBody>
         <DialogFooter />
