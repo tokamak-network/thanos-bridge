@@ -8,7 +8,7 @@ import {
 import { BridgeTransactionInfo } from "@/types/bridge";
 import { ButtonProps, Flex, Input, Text } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { TokenSelectionComponent } from "./TokenSelect";
 import { getParsedAmount, trimTokenBalance } from "@/utils/token-balance";
@@ -63,6 +63,12 @@ export const TokenInputComponent: React.FC = () => {
       amount,
     }));
   };
+
+  useEffect(() => {
+    if (balance && transaction.amount > balance.value) setIsInsufficient(true);
+    else setIsInsufficient(false);
+  }, [balance, transaction.amount, setIsInsufficient]);
+
   const handleMaxButtonClick = () => {
     setTransaction((prev: BridgeTransactionInfo) => ({
       ...prev,
