@@ -1,5 +1,4 @@
 const thanosSDK = require("@tokamak-network/thanos-sdk");
-import { ethers } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 import { useWalletConnect } from "../wallet-connect/useWalletConnect";
 import { CrossChainMessenger } from "@tokamak-network/thanos-sdk";
