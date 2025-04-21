@@ -1,5 +1,25 @@
 import { BridgeInfoEnum } from "@/types/bridge";
 import { env } from "next-runtime-env";
+
+export const secondsToHHMMSS = (seconds: number): string => {
+  const days = Math.floor(seconds / (3600 * 24));
+  const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  const parts = [];
+  if (days > 0) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+  if (hours > 0) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
+  if (minutes > 0)
+    parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+  if (remainingSeconds > 0)
+    parts.push(
+      `${remainingSeconds} ${remainingSeconds === 1 ? "second" : "seconds"}`
+    );
+
+  return parts.join(" ") || "0s";
+};
+
 export const getBridgeInfoByCategory = (category: BridgeInfoEnum) => {
   switch (category) {
     case BridgeInfoEnum.L1_CHAIN_INFO:
@@ -44,6 +64,15 @@ export const getBridgeInfoByCategory = (category: BridgeInfoEnum) => {
         {
           title: "Block explorer",
           content: env("NEXT_PUBLIC_L2_BLOCK_EXPLORER"),
+        },
+      ];
+    case BridgeInfoEnum.OTHER_INFO:
+      return [
+        {
+          title: "Block batching period",
+          content: secondsToHHMMSS(
+            parseInt(env("NEXT_PUBLIC_L2_BLOCK_BATCHING_PERIOD") || "432000")
+          ),
         },
       ];
     default:

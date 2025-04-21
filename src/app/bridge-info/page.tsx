@@ -17,7 +17,6 @@ const BridgeInfoPageContent: React.FC = () => {
     <Flex w={"100%"} justifyContent={"center"}>
       <Flex
         mt={"48px"}
-        w={"480px"}
         justifyContent={"center"}
         alignItems={"center"}
         flexDir={"column"}
