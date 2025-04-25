@@ -52,3 +52,29 @@ export const downloadTxHash = (
   a.download = txHash;
   a.click();
 };
+
+export const getDate = (date: string) => {
+  const dateObj = new Date(date);
+  return dateObj.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+export const getRemainingSeconds = (date: string) => {
+  const dateObj = new Date(date);
+  const now = new Date();
+  const batchingTime = parseInt(
+    process.env.NEXT_PUBLIC_L2_BLOCK_BATCHING_PERIOD || "0"
+  );
+  const stateRootProposalPeriod = parseInt(
+    process.env.NEXT_PUBLIC_L2_STATE_ROOT_PROPOSAL_PERIOD || "0"
+  );
+  const diff =
+    dateObj.getTime() +
+    Math.max(batchingTime * 1000, stateRootProposalPeriod * 1000) -
+    now.getTime();
+  const diffInSeconds = Math.floor(diff / 1000);
+  return isNaN(diffInSeconds) ? 0 : Math.max(diffInSeconds, 0);
+};

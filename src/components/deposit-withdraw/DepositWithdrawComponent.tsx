@@ -46,6 +46,7 @@ export const DepositWithdrawComponent: React.FC = () => {
   const { isConnected } = useWalletConnect();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [isInsufficient] = useAtom(jotaiIsInsufficient);
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
   const isAvailableToBridge =
     transaction.formatted !== "" && getParsedAmount(transaction.formatted, 18);
   const needToApprove = useMemo(() => {
@@ -158,6 +159,9 @@ export const DepositWithdrawComponent: React.FC = () => {
             isValid={isValidInitiateTxHash || initiateTxHash.length === 0}
             onChange={handleInitiateTxHashChange}
             initiateTxHash={initiateTxHash}
+            step={transaction.step}
+            remainingSeconds={remainingSeconds}
+            setRemainingSeconds={setRemainingSeconds}
           />
         ) : (
           <>
@@ -208,7 +212,7 @@ export const DepositWithdrawComponent: React.FC = () => {
             onClick={async () => {
               await handleProveTransaction();
             }}
-            disabled={!isValidInitiateTxHash}
+            disabled={!isValidInitiateTxHash || remainingSeconds > 0}
             isLoading={
               transactionConfirmModalStatus.status ===
               TransactionStatusEnum.READY_TO_CONFIRM
