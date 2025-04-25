@@ -1,14 +1,29 @@
-import { getFilenameWithoutExtension } from "@/utils/file";
+import { BridgingStepEnum } from "@/types/bridge";
+import { getRemainingSeconds } from "@/utils/bridge";
+import { secondsToHHMMSS } from "@/utils/bridge-info";
 import { Button, Flex, Input, Text } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect } from "react";
 interface IProveFinalizeWithdrawalComponentProps {
   initiateTxHash: string;
   onChange: (value: string) => void;
   isValid: boolean;
+  step: BridgingStepEnum;
+  remainingSeconds: number;
+  setRemainingSeconds: (value: number) => void;
 }
 export const ProveFinalizeWithdrawalComponent: React.FC<
   IProveFinalizeWithdrawalComponentProps
-> = ({ initiateTxHash, onChange, isValid }) => {
+> = ({
+  initiateTxHash,
+  onChange,
+  isValid,
+  step,
+  remainingSeconds,
+  setRemainingSeconds,
+}) => {
+  useEffect(() => {
+    setRemainingSeconds(0);
+  }, [step]);
   const onImportClick = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -18,8 +33,23 @@ export const ProveFinalizeWithdrawalComponent: React.FC<
       const target = event.target as HTMLInputElement;
       const file = target.files?.[0];
       if (file) {
-        const filenameWithoutExtension = getFilenameWithoutExtension(file.name);
-        onChange(filenameWithoutExtension);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target?.result as string;
+          const lines = content.split("\n");
+
+          for (const line of lines) {
+            if (line.startsWith("Date:")) {
+              const date = line.split(": ")[1].trim();
+              const remainingSeconds = getRemainingSeconds(date);
+              setRemainingSeconds(remainingSeconds);
+            }
+            if (line.startsWith("Transaction Hash: ")) {
+              onChange(line.split(": ")[1].trim());
+            }
+          }
+        };
+        reader.readAsText(file);
       }
     };
 
@@ -44,7 +74,10 @@ export const ProveFinalizeWithdrawalComponent: React.FC<
           fontSize={"16px"}
           color={"454954"}
           value={initiateTxHash}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            setRemainingSeconds(0);
+            onChange(e.target.value);
+          }}
         />
         <Button
           color={"#FFF"}
@@ -56,6 +89,11 @@ export const ProveFinalizeWithdrawalComponent: React.FC<
         </Button>
       </Flex>
       {!isValid && <Text color={"#DD3A44"}>Please enter a valid txn</Text>}
+      {remainingSeconds > 0 && step === BridgingStepEnum.PROVE && (
+        <Text color={"#8C8F97"} lineHeight={"22px"}>
+          {secondsToHHMMSS(remainingSeconds)} remaining
+        </Text>
+      )}
     </Flex>
   );
 };

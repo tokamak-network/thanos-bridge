@@ -69,9 +69,33 @@ export const getBridgeInfoByCategory = (category: BridgeInfoEnum) => {
     case BridgeInfoEnum.OTHER_INFO:
       return [
         {
-          title: "Block batching period",
+          title: "L1 Block Time",
           content: secondsToHHMMSS(
-            parseInt(env("NEXT_PUBLIC_L2_BLOCK_BATCHING_PERIOD") || "432000")
+            parseInt(env("NEXT_PUBLIC_L1_BLOCK_TIME") || "12")
+          ),
+        },
+        {
+          title: "L2 Block Time",
+          content: secondsToHHMMSS(
+            parseInt(env("NEXT_PUBLIC_L2_BLOCK_TIME") || "6")
+          ),
+        },
+        {
+          title: "Batch submission interval",
+          content: secondsToHHMMSS(
+            parseInt(env("NEXT_PUBLIC_L2_BLOCK_BATCHING_PERIOD") || "18000")
+          ),
+        },
+        {
+          title: "State root proposal period",
+          content: secondsToHHMMSS(
+            parseInt(env("NEXT_PUBLIC_L2_STATE_ROOT_PROPOSAL_PERIOD") || "240")
+          ),
+        },
+        {
+          title: "Challenge period",
+          content: secondsToHHMMSS(
+            parseInt(env("NEXT_PUBLIC_CHALLENGE_PERIOD") || "12")
           ),
         },
       ];
