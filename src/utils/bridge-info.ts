@@ -77,7 +77,7 @@ export const getBridgeInfoByCategory = (category: BridgeInfoEnum) => {
         {
           title: "L2 Block Time",
           content: secondsToHHMMSS(
-            parseInt(env("NEXT_PUBLIC_L2_BLOCK_TIME") || "6")
+            parseInt(env("NEXT_PUBLIC_L2_BLOCK_TIME") || "2")
           ),
         },
         {
