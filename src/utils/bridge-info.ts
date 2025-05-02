@@ -81,15 +81,15 @@ export const getBridgeInfoByCategory = (category: BridgeInfoEnum) => {
           ),
         },
         {
-          title: "Batch submission interval",
+          title: "Batch submission frequency",
           content: secondsToHHMMSS(
-            parseInt(env("NEXT_PUBLIC_L2_BLOCK_BATCHING_PERIOD") || "18000")
+            parseInt(env("NEXT_PUBLIC_BATCH_SUBMISSION_FREQUENCY") || "18000")
           ),
         },
         {
-          title: "State root proposal period",
+          title: "L2 output root frequency",
           content: secondsToHHMMSS(
-            parseInt(env("NEXT_PUBLIC_L2_STATE_ROOT_PROPOSAL_PERIOD") || "240")
+            parseInt(env("NEXT_PUBLIC_OUTPUT_ROOT_FREQUENCY") || "240")
           ),
         },
         {

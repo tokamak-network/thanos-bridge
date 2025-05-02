@@ -4,6 +4,7 @@ import {
   BridgeTransactionInfo,
 } from "@/types/bridge";
 import { Token } from "@/types/token";
+import { env } from "next-runtime-env";
 
 export const getBridgeTokenType = (token: Token): BridgeTokenEnum => {
   switch (token.bridgedTokenSymbol) {
@@ -66,10 +67,10 @@ export const getRemainingSeconds = (date: string) => {
   const dateObj = new Date(date);
   const now = new Date();
   const batchingTime = parseInt(
-    process.env.NEXT_PUBLIC_L2_BLOCK_BATCHING_PERIOD || "0"
+    env("NEXT_PUBLIC_BATCH_SUBMISSION_FREQUENCY") || "0"
   );
   const stateRootProposalPeriod = parseInt(
-    process.env.NEXT_PUBLIC_L2_STATE_ROOT_PROPOSAL_PERIOD || "0"
+    env("NEXT_PUBLIC_OUTPUT_ROOT_FREQUENCY") || "0"
   );
   const diff =
     dateObj.getTime() +
