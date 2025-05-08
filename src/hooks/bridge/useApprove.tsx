@@ -5,6 +5,8 @@ import { AddressLike } from "@tokamak-network/thanos-sdk";
 import { ethers } from "ethers";
 import erc20ABI from "@/abi/erc20.json";
 import { L2_USDC_ADDRESS, L2_USDC_BRIDGE_ADDRESS } from "@/constants/contract";
+import { getEthersSigner } from "@/utils/provider";
+import { config } from "@/config/wagmi.config";
 
 export const useApprove = (
   setIsApproving: (value: boolean) => void,
@@ -36,12 +38,8 @@ export const useApprove = (
   };
 
   const approveUSDC = async (amount: bigint) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const usdc = new ethers.Contract(
-      L2_USDC_ADDRESS,
-      erc20ABI,
-      provider.getSigner()
-    );
+    const signer = await getEthersSigner(config);
+    const usdc = new ethers.Contract(L2_USDC_ADDRESS, erc20ABI, signer);
     try {
       setIsApproving(true);
       const tx = await usdc.approve(L2_USDC_BRIDGE_ADDRESS, amount);
