@@ -29,6 +29,7 @@ import { BridgingStepEnum } from "../../types/bridge";
 import { WithdrawStepComponent } from "./WithdrawStep";
 import { ProveFinalizeWithdrawalComponent } from "./ProveFinalizeWithdrawal";
 import { useNetwork } from "@/hooks/network/useNetwork";
+import { MessageStatus } from "@tokamak-network/thanos-sdk";
 
 export const DepositWithdrawComponent: React.FC = () => {
   const [transaction, setTransaction] = useAtom(jotaiBridgeTransactionInfo);
@@ -41,12 +42,13 @@ export const DepositWithdrawComponent: React.FC = () => {
   const [initiateTxHash, setInitiateTxHash] = useState<string>("");
   const { switchToL1, switchToL2 } = useNetwork();
   const { deposit } = useDeposit();
-  const { withdraw, prove, finalize } = useWithdraw();
+  const { withdraw, prove, finalize, getMessageStatus } = useWithdraw();
   const { approve, approveUSDC } = useApprove(setIsApproving, setIsApproved);
   const { isConnected } = useWalletConnect();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [isInsufficient] = useAtom(jotaiIsInsufficient);
-  const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
+  const [isReadyToProveOrFinalize, setIsReadyToProveOrFinalize] =
+    useState<boolean>(false);
   const isAvailableToBridge =
     transaction.formatted !== "" && getParsedAmount(transaction.formatted, 18);
   const needToApprove = useMemo(() => {
@@ -92,14 +94,29 @@ export const DepositWithdrawComponent: React.FC = () => {
       txHash,
     }));
   };
-  const handleInitiateTxHashChange = (value: string) => {
+  const handleInitiateTxHashChange = async (value: string) => {
     setInitiateTxHash(value);
-    setIsValidInitiateTxHash(isValidTxHash(value));
+    const isValid = isValidTxHash(value);
+    setIsValidInitiateTxHash(isValid);
+    if (isValid) {
+      try {
+        const messageStatus = await getMessageStatus(value);
+        setIsReadyToProveOrFinalize(
+          transaction.step === BridgingStepEnum.PROVE
+            ? messageStatus === MessageStatus.READY_TO_PROVE
+            : messageStatus === MessageStatus.READY_FOR_RELAY
+        );
+      } catch (error) {
+        setIsReadyToProveOrFinalize(false);
+        console.error(error);
+      }
+    }
   };
   const handleBridgeStepChange = async (step: BridgingStepEnum) => {
     if (transaction.mode === BridgeModeEnum.DEPOSIT) return;
     setInitiateTxHash("");
     setIsValidInitiateTxHash(false);
+    setIsReadyToProveOrFinalize(false);
     try {
       if (step === BridgingStepEnum.INITIATE) await switchToL2();
       else await switchToL1();
@@ -160,8 +177,7 @@ export const DepositWithdrawComponent: React.FC = () => {
             onChange={handleInitiateTxHashChange}
             initiateTxHash={initiateTxHash}
             step={transaction.step}
-            remainingSeconds={remainingSeconds}
-            setRemainingSeconds={setRemainingSeconds}
+            isReadyToProveOrFinalize={isReadyToProveOrFinalize}
           />
         ) : (
           <>
@@ -212,7 +228,7 @@ export const DepositWithdrawComponent: React.FC = () => {
             onClick={async () => {
               await handleProveTransaction();
             }}
-            disabled={!isValidInitiateTxHash || remainingSeconds > 0}
+            disabled={!isValidInitiateTxHash || !isReadyToProveOrFinalize}
             isLoading={
               transactionConfirmModalStatus.status ===
               TransactionStatusEnum.READY_TO_CONFIRM
@@ -224,7 +240,7 @@ export const DepositWithdrawComponent: React.FC = () => {
         isConnected && (
           <BigButtonComponent
             content={"Finalize"}
-            disabled={!isValidInitiateTxHash}
+            disabled={!isValidInitiateTxHash || !isReadyToProveOrFinalize}
             onClick={async () => {
               await handleFinalizeTransaction();
             }}

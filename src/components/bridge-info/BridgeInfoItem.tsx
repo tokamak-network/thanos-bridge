@@ -31,6 +31,7 @@ export const BridgeInfoItem: React.FC<BridgeInfoItemProps> = ({
           value={content}
           outline={"none"}
           border={"none"}
+          onChange={() => {}}
         />
       </Flex>
     </Flex>

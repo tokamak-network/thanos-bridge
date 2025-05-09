@@ -2,7 +2,7 @@ import { BridgeTokenEnum, BridgeTransactionInfo } from "@/types/bridge";
 import { useThanosSDK } from "./useThanosSDK";
 import { l1Chain, l2Chain } from "@/config/network";
 import { TransactionStatusEnum } from "@/types/transaction";
-import { AddressLike } from "@tokamak-network/thanos-sdk";
+import { AddressLike, MessageStatus } from "@tokamak-network/thanos-sdk";
 import { useAtom } from "jotai";
 import { jotaiGeneralWarningModal } from "@/jotai/bridge";
 import { downloadTxHash } from "@/utils/bridge";
@@ -174,5 +174,10 @@ export const useWithdraw = () => {
     }
   };
 
-  return { withdraw, prove, finalize };
+  const getMessageStatus = async (txHash: string): Promise<MessageStatus> => {
+    if (!crossChainMessenger) throw new Error("CrossChainMessenger not found");
+    return await crossChainMessenger.getMessageStatus(txHash);
+  };
+
+  return { withdraw, prove, finalize, getMessageStatus };
 };
