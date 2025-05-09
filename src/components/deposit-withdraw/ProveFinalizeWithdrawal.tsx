@@ -7,10 +7,18 @@ interface IProveFinalizeWithdrawalComponentProps {
   isValid: boolean;
   step: BridgingStepEnum;
   isReadyToProveOrFinalize: boolean;
+  isVerifyingTxHash: boolean;
 }
 export const ProveFinalizeWithdrawalComponent: React.FC<
   IProveFinalizeWithdrawalComponentProps
-> = ({ initiateTxHash, onChange, isValid, step, isReadyToProveOrFinalize }) => {
+> = ({
+  initiateTxHash,
+  onChange,
+  isValid,
+  step,
+  isReadyToProveOrFinalize,
+  isVerifyingTxHash,
+}) => {
   const onImportClick = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -72,12 +80,18 @@ export const ProveFinalizeWithdrawalComponent: React.FC<
       {!isValid && (
         <Text color={"#DD3A44"}>Please enter a valid transaction hash.</Text>
       )}
-      {isValid && initiateTxHash && !isReadyToProveOrFinalize && (
-        <Text color={"#DD3A44"}>
-          {step === BridgingStepEnum.PROVE
-            ? "The transaction is not ready to be proved."
-            : "The transaction is not ready for finalize."}
-        </Text>
+      {!isVerifyingTxHash &&
+        isValid &&
+        initiateTxHash &&
+        !isReadyToProveOrFinalize && (
+          <Text color={"#DD3A44"}>
+            {step === BridgingStepEnum.PROVE
+              ? "The transaction is not ready to be proved."
+              : "The transaction is not ready for finalize."}
+          </Text>
+        )}
+      {isVerifyingTxHash && (
+        <Text color={"#8C8F97"}>Verifying transaction hash...</Text>
       )}
     </Flex>
   );

@@ -39,6 +39,7 @@ export const DepositWithdrawComponent: React.FC = () => {
   const [isApproved, setIsApproved] = useState<boolean>(false);
   const [isValidInitiateTxHash, setIsValidInitiateTxHash] =
     useState<boolean>(false);
+  const [isVerifyingTxHash, setIsVerifyingTxHash] = useState<boolean>(false);
   const [initiateTxHash, setInitiateTxHash] = useState<string>("");
   const { switchToL1, switchToL2 } = useNetwork();
   const { deposit } = useDeposit();
@@ -100,6 +101,8 @@ export const DepositWithdrawComponent: React.FC = () => {
     setIsValidInitiateTxHash(isValid);
     if (isValid) {
       try {
+        setIsReadyToProveOrFinalize(false);
+        setIsVerifyingTxHash(true);
         const messageStatus = await getMessageStatus(value);
         setIsReadyToProveOrFinalize(
           transaction.step === BridgingStepEnum.PROVE
@@ -109,6 +112,8 @@ export const DepositWithdrawComponent: React.FC = () => {
       } catch (error) {
         setIsReadyToProveOrFinalize(false);
         console.error(error);
+      } finally {
+        setIsVerifyingTxHash(false);
       }
     }
   };
@@ -178,6 +183,7 @@ export const DepositWithdrawComponent: React.FC = () => {
             initiateTxHash={initiateTxHash}
             step={transaction.step}
             isReadyToProveOrFinalize={isReadyToProveOrFinalize}
+            isVerifyingTxHash={isVerifyingTxHash}
           />
         ) : (
           <>
