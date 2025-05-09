@@ -1,29 +1,16 @@
 import { BridgingStepEnum } from "@/types/bridge";
-import { getRemainingSeconds } from "@/utils/bridge";
-import { secondsToHHMMSS } from "@/utils/bridge-info";
 import { Button, Flex, Input, Text } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import React from "react";
 interface IProveFinalizeWithdrawalComponentProps {
   initiateTxHash: string;
   onChange: (value: string) => void;
   isValid: boolean;
   step: BridgingStepEnum;
-  remainingSeconds: number;
-  setRemainingSeconds: (value: number) => void;
+  isReadyToProveOrFinalize: boolean;
 }
 export const ProveFinalizeWithdrawalComponent: React.FC<
   IProveFinalizeWithdrawalComponentProps
-> = ({
-  initiateTxHash,
-  onChange,
-  isValid,
-  step,
-  remainingSeconds,
-  setRemainingSeconds,
-}) => {
-  useEffect(() => {
-    setRemainingSeconds(0);
-  }, [step]);
+> = ({ initiateTxHash, onChange, isValid, step, isReadyToProveOrFinalize }) => {
   const onImportClick = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -39,11 +26,6 @@ export const ProveFinalizeWithdrawalComponent: React.FC<
           const lines = content.split("\n");
 
           for (const line of lines) {
-            if (line.startsWith("Date:")) {
-              const date = line.split(": ")[1].trim();
-              const remainingSeconds = getRemainingSeconds(date);
-              setRemainingSeconds(remainingSeconds);
-            }
             if (line.startsWith("Transaction Hash: ")) {
               onChange(line.split(": ")[1].trim());
             }
@@ -75,7 +57,6 @@ export const ProveFinalizeWithdrawalComponent: React.FC<
           color={"454954"}
           value={initiateTxHash}
           onChange={(e) => {
-            setRemainingSeconds(0);
             onChange(e.target.value);
           }}
         />
@@ -88,10 +69,14 @@ export const ProveFinalizeWithdrawalComponent: React.FC<
           Import
         </Button>
       </Flex>
-      {!isValid && <Text color={"#DD3A44"}>Please enter a valid txn</Text>}
-      {remainingSeconds > 0 && step === BridgingStepEnum.PROVE && (
-        <Text color={"#8C8F97"} lineHeight={"22px"}>
-          {secondsToHHMMSS(remainingSeconds)} remaining
+      {!isValid && (
+        <Text color={"#DD3A44"}>Please enter a valid transaction hash.</Text>
+      )}
+      {isValid && initiateTxHash && !isReadyToProveOrFinalize && (
+        <Text color={"#DD3A44"}>
+          {step === BridgingStepEnum.PROVE
+            ? "The transaction is not ready to be proved."
+            : "The transaction is not ready for finalize."}
         </Text>
       )}
     </Flex>

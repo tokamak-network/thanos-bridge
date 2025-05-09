@@ -4,11 +4,21 @@ import type { Account, Chain, Client, Transport } from "viem";
 
 export function clientToSigner(client: Client<Transport, Chain, Account>) {
   const { account, chain, transport } = client;
+
+  if (!chain) {
+    throw new Error("Chain is undefined in client");
+  }
+
   const network = {
     chainId: chain.id,
     name: chain.name,
     ensAddress: chain.contracts?.ensRegistry?.address,
   };
+
+  if (!account) {
+    throw new Error("Account is undefined in client");
+  }
+
   const provider = new providers.Web3Provider(transport, network);
   const signer = provider.getSigner(account.address);
   return signer;
