@@ -2,7 +2,7 @@ import { TokenSymbolComponent } from "@/components/icons/TokenSymbol";
 import { useWalletConnect } from "@/hooks/wallet-connect/useWalletConnect";
 import { BridgeTransactionInfo } from "@/types/bridge";
 import { trimAddress } from "@/utils/address";
-import { trimTokenBalance } from "@/utils/token-balance";
+import { getFormattedTokenBalance } from "@/utils/token-balance";
 import { Box, Flex, Text } from "@chakra-ui/react";
 
 interface ITransactionDetailComponentProps {
@@ -29,7 +29,7 @@ export const TransactionDetailComponent: React.FC<
           </Text>
           <Flex alignItems={"center"} gap={"12px"}>
             <Text fontSize={"16px"} fontWeight={600} lineHeight={"24px"}>
-              {trimTokenBalance(transaction.formatted, 2)}
+              {getFormattedTokenBalance(transaction.formatted)}
             </Text>
             <Flex alignItems={"center"} gap={"6px"}>
               <TokenSymbolComponent
@@ -50,7 +50,7 @@ export const TransactionDetailComponent: React.FC<
           </Text>
           <Flex alignItems={"center"} gap={"12px"}>
             <Text fontSize={"16px"} fontWeight={600} lineHeight={"24px"}>
-              {trimTokenBalance(transaction.formatted, 2)}
+              {getFormattedTokenBalance(transaction.formatted)}
             </Text>
             <Flex alignItems={"center"} gap={"6px"}>
               <TokenSymbolComponent

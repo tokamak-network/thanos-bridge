@@ -37,3 +37,8 @@ export const trimTokenBalance = (balance: string, decimals: number) => {
   if (!decimal) return balance;
   return `${whole}.${decimal.slice(0, decimals)}`;
 };
+
+export const getFormattedTokenBalance = (balance: string) => {
+  if (Number(balance) < 0.01) return "< 0.01";
+  return trimTokenBalance(balance, 2);
+};
