@@ -8,9 +8,11 @@ import { l1Provider, l2Provider } from "@/constants/provider";
 import { env } from "next-runtime-env";
 import { getEthersSigner } from "@/utils/provider";
 import { config } from "@/config/wagmi.config";
+import { useChainId } from "wagmi";
 
 export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
   const { isConnected, chain } = useWalletConnect();
+  const chainId = useChainId();
   const [crossChainMessenger, setCrossChainMessenger] =
     useState<CrossChainMessenger | null>(null);
   const chainLayer = useMemo(
@@ -22,6 +24,7 @@ export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
       try {
         if (!l1ChainId || !l2ChainId) return;
         if (!isConnected) return;
+        await new Promise((resolve) => setTimeout(resolve, 500));
         const signer = await getEthersSigner(config);
         const l1Contracts = {
           AddressManager: env("NEXT_PUBLIC_ADDRESS_MANAGER_ADDRESS"),
@@ -59,7 +62,7 @@ export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
       }
     };
     init();
-  }, [l1ChainId, l2ChainId, chain, isConnected, chainLayer]);
+  }, [l1ChainId, l2ChainId, chain, isConnected, chainLayer, chainId]);
 
   const estimateGas = useMemo(() => {
     if (!crossChainMessenger) return null;

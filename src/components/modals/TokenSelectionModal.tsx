@@ -55,7 +55,7 @@ export const TokenSelectionModalComponent = () => {
     >
       <DialogTrigger></DialogTrigger>
       <DialogContent
-        w={"420px"}
+        w={"100%"}
         bgColor={"#101217"}
         padding={"24px"}
         borderRadius={"22px"}
@@ -67,6 +67,7 @@ export const TokenSelectionModalComponent = () => {
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+            width={"100%"}
           >
             <Text fontSize={"18px"} fontWeight={"600"}>
               Select token

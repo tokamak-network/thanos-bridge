@@ -13,11 +13,13 @@ export const useNetwork = () => {
   );
 
   const switchChain = async (chainId: number) => {
-    const rpcUrl = getRPCUrlFromChainId(chainId);
     setGlobalLoading(true);
     try {
       await switchChainAsync({ chainId });
     } catch (error) {
+      if (!isHTTPS(getRPCUrlFromChainId(chainId))) {
+        setInvalidRPCWarningModalOpen(true);
+      }
       setGlobalLoading(false);
       throw error;
     } finally {

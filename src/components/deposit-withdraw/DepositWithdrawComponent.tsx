@@ -160,7 +160,7 @@ export const DepositWithdrawComponent: React.FC = () => {
     await finalize(initiateTxHash, handleTransactionStateChange);
   };
   return (
-    <Flex flexDir={"column"} gap={"32px"} width={"100%"}>
+    <Flex flexDir={"column"} gap={"32px"} width={"100%"} maxW={"600px"}>
       <Flex
         bgColor={"#101217"}
         borderRadius={"22px"}

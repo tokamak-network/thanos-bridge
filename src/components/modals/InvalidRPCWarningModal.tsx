@@ -41,6 +41,7 @@ export const InvalidRPCWarningModalComponent = () => {
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+            width={"100%"}
           >
             <Text fontSize={"18px"} fontWeight={"600"}>
               Warning
@@ -61,9 +62,9 @@ export const InvalidRPCWarningModalComponent = () => {
         </DialogHeader>
         <DialogBody>
           <Text fontSize={"14px"} fontWeight={"400"} color={"#E5E5E5"}>
-            You can&apos;t switch the chain in this app since the RPC URL is not
-            secure. Please try to switch network via your wallet. Read about it
-            more{" "}
+            You can&apos;t automatically switch the chain in this app since the
+            RPC URL is not secure. Please try to add the network in your wallet
+            manually. Read about it more{" "}
             <u>
               <Link href={INVALID_RPC_GUIDE_URL} target="_blank">
                 here

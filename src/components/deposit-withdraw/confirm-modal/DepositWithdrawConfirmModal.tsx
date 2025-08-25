@@ -45,6 +45,7 @@ export const DepositWithdrawConfirmModal: React.FC<{
           <DialogTitle
             display={"flex"}
             justifyContent={"space-between"}
+            alignItems={"center"}
             width={"100%"}
           >
             <Text fontSize={"18px"} fontWeight={"600"}>
