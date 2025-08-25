@@ -1,8 +1,7 @@
 name: Push docker image to docker hub
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - main
 
