@@ -14,10 +14,6 @@ export const useNetwork = () => {
 
   const switchChain = async (chainId: number) => {
     const rpcUrl = getRPCUrlFromChainId(chainId);
-    if (!isHTTPS(rpcUrl)) {
-      await setInvalidRPCWarningModalOpen(true);
-      throw new Error("Invalid RPC URL");
-    }
     setGlobalLoading(true);
     try {
       await switchChainAsync({ chainId });
