@@ -1,4 +1,5 @@
 import { BridgeInfoEnum } from "@/types/bridge";
+import { L2_ETH_ADDRESS } from "@/constants/contract";
 import { env } from "next-runtime-env";
 
 export const secondsToHHMMSS = (seconds: number): string => {
@@ -60,6 +61,10 @@ export const getBridgeInfoByCategory = (category: BridgeInfoEnum) => {
         {
           title: "Native currency decimals",
           content: env("NEXT_PUBLIC_L2_NATIVE_CURRENCY_DECIMALS"),
+        },
+        {
+          title: "ETH Address",
+          content: L2_ETH_ADDRESS,
         },
         {
           title: "Block explorer",

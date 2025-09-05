@@ -1,6 +1,6 @@
 import { Token } from "@/types/token";
 import { l1Chain, l2Chain } from "@/config/network";
-import { L2_USDC_ADDRESS } from "./contract";
+import { L2_USDC_ADDRESS, L2_ETH_ADDRESS } from "./contract";
 import { env } from "next-runtime-env";
 export const supportedTokens: Token[] = [
   {
@@ -17,7 +17,7 @@ export const supportedTokens: Token[] = [
     name: "Ether",
     symbol: "ETH",
     decimals: 18,
-    address: "0x4200000000000000000000000000000000000486",
+    address: L2_ETH_ADDRESS,
     bridgedTokenSymbol: "eth",
   },
   {
