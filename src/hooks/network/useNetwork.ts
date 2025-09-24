@@ -16,6 +16,7 @@ export const useNetwork = () => {
     setGlobalLoading(true);
     try {
       await switchChainAsync({ chainId });
+      await new Promise((resolve) => setTimeout(resolve, 500));
     } catch (error) {
       if (!isHTTPS(getRPCUrlFromChainId(chainId))) {
         setInvalidRPCWarningModalOpen(true);

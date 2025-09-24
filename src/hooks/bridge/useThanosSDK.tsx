@@ -25,7 +25,7 @@ export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
         if (!l1ChainId || !l2ChainId) return;
         if (!isConnected) return;
         await new Promise((resolve) => setTimeout(resolve, 500));
-        const signer = await getEthersSigner(config);
+        const signer = await getEthersSigner(config, { chainId });
         const l1Contracts = {
           AddressManager: env("NEXT_PUBLIC_ADDRESS_MANAGER_ADDRESS"),
           L1CrossDomainMessenger: env(
@@ -62,7 +62,7 @@ export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
       }
     };
     init();
-  }, [l1ChainId, l2ChainId, chain, isConnected, chainLayer, chainId]);
+  }, [isConnected, chainId]);
 
   const estimateGas = useMemo(() => {
     if (!crossChainMessenger) return null;
