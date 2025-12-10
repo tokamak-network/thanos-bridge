@@ -3,7 +3,7 @@ import React from "react";
 import EthereumIcon from "@/assets/icons/token/ethereum.svg";
 import USDTIcon from "@/assets/icons/token/usdt.svg";
 import USDCIcon from "@/assets/icons/token/usdc.svg";
-import NativeTokenIcon from "@/assets/icons/token/native-token.svg";
+import NativeTokenIcon from "@/assets/icons/token/TN-64.svg";
 
 export interface ITokenSymbolComponentProps {
   width?: number;
