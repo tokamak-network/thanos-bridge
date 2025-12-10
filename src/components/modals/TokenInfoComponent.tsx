@@ -59,7 +59,7 @@ export const TokenInfoComponent: React.FC<ITokenInfoComponentProps> = ({
         </Flex>
       </Flex>
       <Text fontSize={"18px"} lineHeight={"24px"}>
-        {trimTokenBalance(balance?.formatted ?? "0", 4)}
+        {trimTokenBalance(balance?.formatted ?? "0", 6)}
       </Text>
     </Button>
   );

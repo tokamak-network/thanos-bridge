@@ -116,7 +116,7 @@ export const TokenInputComponent: React.FC = () => {
         {isConnected && (
           <Flex gap={"6px"} alignItems={"center"} justifyContent={"flex-end"}>
             <Text fontWeight={400} color={"#8C8F97"}>
-              {`Balance: ${trimTokenBalance(balance?.formatted ?? "0", 2)}`}
+              {`Balance: ${trimTokenBalance(balance?.formatted ?? "0", 6)}`}
             </Text>
             <MaxBalanceButtonComponent
               onClick={handleMaxButtonClick}
