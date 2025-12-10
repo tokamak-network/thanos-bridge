@@ -47,8 +47,8 @@ This is a DApp which interacts with the Thanos chain where the users can bridge 
 | `NEXT_PUBLIC_L2_CHAIN_NAME`                     | The name of the L2 chain (e.g. "Thanos Sep")                |
 | `NEXT_PUBLIC_L2_CHAIN_ID`                       | The chain ID of the L2 chain (e.g. 1237345)                 |
 | `NEXT_PUBLIC_L2_RPC`                            | The RPC URL of the L2 chain                                 |
-| `NEXT_PUBLIC_L2_NATIVE_CURRENCY_NAME`           | The name of the L2 native currency (e.g. "TON")             |
-| `NEXT_PUBLIC_L2_NATIVE_CURRENCY_SYMBOL`         | The symbol of the L2 native currency (e.g. "TON")           |
+| `NEXT_PUBLIC_L2_NATIVE_CURRENCY_NAME`           | The name of the L2 native currency (e.g. "TOKAMAK")             |
+| `NEXT_PUBLIC_L2_NATIVE_CURRENCY_SYMBOL`         | The symbol of the L2 native currency (e.g. "TOKAMAK")           |
 | `NEXT_PUBLIC_L2_NATIVE_CURRENCY_DECIMALS`       | The number of decimals for the L2 native currency (e.g. 18) |
 | `NEXT_PUBLIC_L2_BLOCK_EXPLORER`                 | The block explorer URL for the L2 chain                     |
 | `NEXT_PUBLIC_NATIVE_TOKEN_L1_ADDRESS`           | The L1 address of the native token                          |
