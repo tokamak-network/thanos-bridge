@@ -1,7 +1,9 @@
 "use client";
 
+import { AddToWalletButton } from "@/components/bridge-info/AddToWalletButton";
 import { BridgeInfoItem } from "@/components/bridge-info/BridgeInfoItem";
 import { BridgeInfoTab } from "@/components/bridge-info/BridgeInfoTab";
+import { l1Chain, l2Chain } from "@/config/network";
 import { BridgeInfoEnum } from "@/types/bridge";
 import { getBridgeInfoByCategory } from "@/utils/bridge-info";
 import { Flex } from "@chakra-ui/react";
@@ -13,8 +15,14 @@ const BridgeInfoPageContent: React.FC = () => {
     BridgeInfoEnum.L1_CHAIN_INFO
   );
   const bridgeInfo = useMemo(() => getBridgeInfoByCategory(item), [item]);
+
+  const selectedChain = useMemo(() => {
+    if (item === BridgeInfoEnum.L1_CHAIN_INFO) return l1Chain;
+    if (item === BridgeInfoEnum.L2_CHAIN_INFO) return l2Chain;
+    return null;
+  }, [item]);
   return (
-    <Flex w={"100%"} justifyContent={"center"}>
+    <Flex w={"100%"} justifyContent={"center"} pb={"80px"}>
       <Flex
         mt={"48px"}
         justifyContent={"center"}
@@ -38,6 +46,11 @@ const BridgeInfoPageContent: React.FC = () => {
               />
             ))}
         </Flex>
+        {selectedChain && (
+          <Flex w={"100%"} mt={"8px"}>
+            <AddToWalletButton chain={selectedChain} />
+          </Flex>
+        )}
       </Flex>
     </Flex>
   );
