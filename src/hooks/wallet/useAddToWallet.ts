@@ -1,5 +1,5 @@
 import { Chain } from "wagmi/chains";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const toHex = (chainId: number) => `0x${chainId.toString(16)}`;
 
@@ -43,6 +43,13 @@ const getCurrentChainId = async (): Promise<string | null> => {
 export const useAddToWallet = () => {
   const [isAdding, setIsAdding] = useState(false);
   const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const addNetworkToWallet = useCallback(async (chain: Chain) => {
     if (!window.ethereum) {

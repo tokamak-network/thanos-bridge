@@ -10,6 +10,7 @@ interface AddToWalletButtonProps {
   chain: Chain;
 }
 
+const SUCCESS_STATE_DURATION_MS = 3000;
 const toHex = (chainId: number) => `0x${chainId.toString(16)}`;
 
 export const AddToWalletButton: React.FC<AddToWalletButtonProps> = ({
@@ -20,6 +21,8 @@ export const AddToWalletButton: React.FC<AddToWalletButtonProps> = ({
   const [isOnNetwork, setIsOnNetwork] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isMountedRef = useRef(true);
+  const isAddingRef = useRef(isAdding);
+  isAddingRef.current = isAdding;
 
   // Check if already on this network
   useEffect(() => {
@@ -52,7 +55,7 @@ export const AddToWalletButton: React.FC<AddToWalletButtonProps> = ({
       setIsOnNetwork(isTargetChain);
 
       // If we switched to this chain and were in adding state, show success
-      if (isTargetChain && isAdding) {
+      if (isTargetChain && isAddingRef.current) {
         setIsSuccess(true);
         toast.success(`Connected to ${chain.name}`);
 
@@ -64,7 +67,7 @@ export const AddToWalletButton: React.FC<AddToWalletButtonProps> = ({
           if (isMountedRef.current) {
             setIsSuccess(false);
           }
-        }, 3000);
+        }, SUCCESS_STATE_DURATION_MS);
       }
     };
 
@@ -73,12 +76,10 @@ export const AddToWalletButton: React.FC<AddToWalletButtonProps> = ({
     return () => {
       ethereum.removeListener("chainChanged", handleChainChanged);
     };
-  }, [chain.id, chain.name, isAdding]);
+  }, [chain.id, chain.name]);
 
   // Cleanup on unmount
   useEffect(() => {
-    isMountedRef.current = true;
-
     return () => {
       isMountedRef.current = false;
       if (timeoutRef.current) {
@@ -116,7 +117,7 @@ export const AddToWalletButton: React.FC<AddToWalletButtonProps> = ({
         if (isMountedRef.current) {
           setIsSuccess(false);
         }
-      }, 3000);
+      }, SUCCESS_STATE_DURATION_MS);
     } else {
       setIsSuccess(false);
       toast.error(result.error);
