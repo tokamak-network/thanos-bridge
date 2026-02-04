@@ -43,6 +43,19 @@ const GNBComponentInner = () => {
         </Flex>
       </Flex>
       <Flex gap={"40px"} alignItems={"center"}>
+        <Text
+          fontSize={"16px"}
+          fontWeight={500}
+          lineHeight={"24px"}
+          color={pathname === "/stealth" ? "#0070ED" : "#FFFFFF"}
+          cursor={"pointer"}
+          _hover={{
+            color: "#0070ED",
+          }}
+          onClick={() => router.push("/stealth")}
+        >
+          Stealth
+        </Text>
         <Link href={USER_GUIDE_URL} target="_blank" rel="noopener noreferrer">
           <Text
             fontSize={"16px"}
