@@ -38,3 +38,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# deployment artifacts
+*-deployment.json
+
+# relayer logs
+/tmp/relayer.log

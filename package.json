@@ -6,14 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:stealth": "vitest run src/lib/stealth",
+    "test:e2e": "vitest run src/lib/stealth/__tests__/contracts.test.ts",
+    "deploy:stealth": "node scripts/deploy-stealth.js",
+    "deploy:relayer": "node scripts/deploy-relayer.js",
+    "relayer:start": "node relayer/index.js"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.2.1",
     "@emotion/react": "^11.13.5",
     "@tanstack/react-query": "5.45.1",
     "@tokamak-network/thanos-sdk": "^0.0.14",
+    "@types/elliptic": "^6.4.18",
+    "cors": "^2.8.6",
+    "elliptic": "^6.6.1",
     "ethers": "^5.7.2",
+    "express": "^4.22.1",
     "install": "^0.13.0",
     "jotai": "^2.10.3",
     "next": "15.4.8",
@@ -28,6 +39,7 @@
     "wagmi": "^2.13.3"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^20.12.10",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
@@ -39,10 +51,13 @@
     "eslint": "^8.41.0",
     "eslint-config-next": "15.0.3",
     "eslint-config-typescript": "^3.0.0",
+    "jsdom": "^28.0.0",
     "lokijs": "^1.5.12",
     "pino-pretty": "^10.3.1",
+    "solc": "^0.8.33",
     "supports-color": "^9.4.0",
     "typescript": "^5.4.5",
-    "utf-8-validate": "^5.0.2"
+    "utf-8-validate": "^5.0.2",
+    "vitest": "^4.0.18"
   }
 }
