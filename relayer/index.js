@@ -302,6 +302,24 @@ app.post('/withdraw', async (req, res) => {
 });
 
 /**
+ * Calculate EIP-1559 gas parameters with safety buffer
+ */
+async function calculateGasParams() {
+  const feeData = await provider.getFeeData();
+  const block = await provider.getBlock('latest');
+
+  const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
+  const priorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei');
+
+  // maxFeePerGas = max(2x baseFee, 1.2x (baseFee + priorityFee))
+  const twoXBaseFee = baseFee.mul(2);
+  const basePlusPriority = baseFee.add(priorityFee).mul(12).div(10);
+  const maxFeePerGas = twoXBaseFee.gt(basePlusPriority) ? twoXBaseFee : basePlusPriority;
+
+  return { maxFeePerGas, maxPriorityFeePerGas: priorityFee };
+}
+
+/**
  * Process withdrawal transaction
  */
 async function processWithdrawal(jobId, stealthWallet, recipient, balance, fee, amountAfterFee) {
@@ -311,38 +329,53 @@ async function processWithdrawal(jobId, stealthWallet, recipient, balance, fee, 
     job.status = 'processing';
     console.log(`[${jobId}] ⏳ Processing withdrawal...`);
 
-    // Get current gas price
-    const gasPrice = await provider.getGasPrice();
-    const gasLimit = 21000; // Simple ETH transfer
-    const gasCost = gasPrice.mul(gasLimit);
+    // Get EIP-1559 gas parameters
+    const { maxFeePerGas, maxPriorityFeePerGas } = await calculateGasParams();
+    const gasLimit = ethers.BigNumber.from(21000);
+    const maxGasCost = gasLimit.mul(maxFeePerGas);
+
+    // Add 5% safety buffer to handle RPC timing differences
+    const safetyBuffer = maxGasCost.mul(5).div(100);
+    const totalGasReserve = maxGasCost.add(safetyBuffer);
+
+    console.log(`[${jobId}] Gas params:`);
+    console.log(`  maxFeePerGas: ${ethers.utils.formatUnits(maxFeePerGas, 'gwei')} gwei`);
+    console.log(`  maxGasCost: ${ethers.utils.formatEther(maxGasCost)} ETH`);
+    console.log(`  safetyBuffer: ${ethers.utils.formatEther(safetyBuffer)} ETH`);
 
     // The stealth wallet sends the amount after fee to recipient
     // Gas is paid from the stealth address balance
-    const sendAmount = amountAfterFee.sub(gasCost);
+    const sendAmount = amountAfterFee.sub(totalGasReserve);
 
     if (sendAmount.lte(0)) {
-      throw new Error('Amount after gas is zero or negative');
+      throw new Error(`Amount after gas is zero or negative. Need at least ${ethers.utils.formatEther(totalGasReserve)} ETH for gas.`);
     }
 
-    // Send to recipient (from stealth address)
+    console.log(`[${jobId}] sendAmount: ${ethers.utils.formatEther(sendAmount)} ETH`);
+
+    // Send to recipient (from stealth address) using EIP-1559
     const tx1 = await stealthWallet.sendTransaction({
       to: recipient,
       value: sendAmount,
-      gasPrice,
-      gasLimit
+      gasLimit,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+      type: 2
     });
     console.log(`[${jobId}] 📤 Recipient tx: ${tx1.hash}`);
     await tx1.wait();
 
-    // Send fee to relayer
+    // Send fee to relayer (what's left in the stealth address)
     const remainingBalance = await provider.getBalance(stealthWallet.address);
-    if (remainingBalance.gt(gasCost)) {
-      const feeToSend = remainingBalance.sub(gasCost);
+    if (remainingBalance.gt(totalGasReserve)) {
+      const feeToSend = remainingBalance.sub(totalGasReserve);
       const tx2 = await stealthWallet.sendTransaction({
         to: relayerWallet.address,
         value: feeToSend,
-        gasPrice,
-        gasLimit
+        gasLimit,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+        type: 2
       });
       console.log(`[${jobId}] 💰 Fee tx: ${tx2.hash}`);
       await tx2.wait();
