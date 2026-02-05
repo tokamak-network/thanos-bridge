@@ -146,7 +146,10 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null) {
         // Gas limit for simple ETH transfer
         const gasLimit = ethers.BigNumber.from(21000);
         const maxGasCost = gasLimit.mul(maxFeePerGas);
-        const sendAmount = balance.sub(maxGasCost);
+
+        // Add 5% safety buffer to gas cost to handle RPC timing differences
+        const safetyBuffer = maxGasCost.mul(5).div(100);
+        const sendAmount = balance.sub(maxGasCost).sub(safetyBuffer);
 
         console.log('[Claim] MaxGasCost:', ethers.utils.formatEther(maxGasCost), 'TON');
         console.log('[Claim] SendAmount:', ethers.utils.formatEther(sendAmount), 'TON');
