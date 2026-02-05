@@ -108,84 +108,107 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null) {
   const claimPayment = useCallback(async (payment: StealthPayment, recipient: string): Promise<string | null> => {
     setError(null);
 
-    try {
-      // Use direct Thanos RPC for the wallet - bypasses MetaMask network issues entirely
-      // The stealth private key controls the funds, so no wallet connection needed for claiming
-      const thanosProvider = getThanosProvider();
-      const wallet = new ethers.Wallet(payment.stealthPrivateKey, thanosProvider);
-      const derived = getAddressFromPrivateKey(payment.stealthPrivateKey);
+    // Retry logic for transient network errors
+    const maxRetries = 3;
+    let lastError: Error | null = null;
 
-      if (derived.toLowerCase() !== payment.announcement.stealthAddress.toLowerCase()) {
-        throw new Error('Key mismatch - cannot claim this payment');
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        // Use direct Thanos RPC for the wallet - bypasses MetaMask network issues entirely
+        const thanosProvider = getThanosProvider();
+        const wallet = new ethers.Wallet(payment.stealthPrivateKey, thanosProvider);
+        const derived = getAddressFromPrivateKey(payment.stealthPrivateKey);
+
+        if (derived.toLowerCase() !== payment.announcement.stealthAddress.toLowerCase()) {
+          throw new Error('Key mismatch - cannot claim this payment');
+        }
+
+        // Get fresh balance right before calculating send amount
+        const balance = await thanosProvider.getBalance(payment.announcement.stealthAddress);
+        if (balance.isZero()) throw new Error('No funds to claim');
+
+        // Get current fee data from Thanos network
+        const feeData = await thanosProvider.getFeeData();
+        const block = await thanosProvider.getBlock('latest');
+
+        // Calculate EIP-1559 gas parameters
+        const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
+        const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei');
+
+        // maxFeePerGas = max(2x baseFee, 1.2x (baseFee + priorityFee))
+        const twoXBaseFee = baseFee.mul(2);
+        const basePlusPriority = baseFee.add(maxPriorityFeePerGas).mul(12).div(10);
+        const maxFeePerGas = twoXBaseFee.gt(basePlusPriority) ? twoXBaseFee : basePlusPriority;
+
+        console.log('[Claim] Attempt', attempt + 1, '- Balance:', ethers.utils.formatEther(balance), 'TON');
+        console.log('[Claim] MaxFeePerGas:', ethers.utils.formatUnits(maxFeePerGas, 'gwei'), 'gwei');
+
+        // Gas limit for simple ETH transfer
+        const gasLimit = ethers.BigNumber.from(21000);
+        const maxGasCost = gasLimit.mul(maxFeePerGas);
+        const sendAmount = balance.sub(maxGasCost);
+
+        console.log('[Claim] MaxGasCost:', ethers.utils.formatEther(maxGasCost), 'TON');
+        console.log('[Claim] SendAmount:', ethers.utils.formatEther(sendAmount), 'TON');
+
+        if (sendAmount.lte(0)) {
+          const minRequired = ethers.utils.formatEther(maxGasCost);
+          throw new Error(`Balance too low for gas. Need at least ${parseFloat(minRequired).toFixed(6)} TON.`);
+        }
+
+        // Re-check balance hasn't changed before sending (TOCTOU protection)
+        const balanceBeforeSend = await thanosProvider.getBalance(payment.announcement.stealthAddress);
+        if (!balanceBeforeSend.eq(balance)) {
+          console.warn('[Claim] Balance changed, recalculating...');
+          continue; // Retry with new balance
+        }
+
+        // Send transaction with explicit EIP-1559 params
+        const tx = await wallet.sendTransaction({
+          to: recipient,
+          value: sendAmount,
+          gasLimit,
+          maxFeePerGas,
+          maxPriorityFeePerGas,
+          type: 2,
+        });
+
+        // Wait for receipt with timeout
+        const receipt = await Promise.race([
+          tx.wait(),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Transaction timeout - check explorer')), 60000)
+          )
+        ]);
+
+        setPayments(prev => prev.map(p =>
+          p.announcement.txHash === payment.announcement.txHash ? { ...p, claimed: true, balance: '0' } : p
+        ));
+
+        return receipt.transactionHash;
+      } catch (e) {
+        lastError = e instanceof Error ? e : new Error('Claim failed');
+        const msg = lastError.message.toLowerCase();
+
+        // Don't retry on permanent errors
+        if (msg.includes('key mismatch') || msg.includes('balance too low') || msg.includes('no funds')) {
+          break;
+        }
+
+        // Retry on transient network errors
+        if (attempt < maxRetries - 1 && (msg.includes('timeout') || msg.includes('network') || msg.includes('nonce'))) {
+          console.warn(`[Claim] Retry ${attempt + 1}/${maxRetries}:`, lastError.message);
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+
+        break;
       }
-
-      // Use direct Thanos RPC for accurate balance and fee data
-      // This bypasses any MetaMask network mismatch issues
-      const balance = await thanosProvider.getBalance(payment.announcement.stealthAddress);
-      if (balance.isZero()) throw new Error('No funds to claim');
-
-      // Production-grade "send max" implementation for EIP-1559
-      // Based on: https://github.com/ethers-io/ethers.js/discussions/4161
-
-      // 1. Get current fee data from Thanos network directly
-      const feeData = await thanosProvider.getFeeData();
-      const block = await thanosProvider.getBlock('latest');
-
-      // 2. Calculate EIP-1559 gas parameters correctly
-      // CRITICAL: maxFeePerGas MUST be >= baseFee + maxPriorityFeePerGas
-      const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.BigNumber.from(1);
-      const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1', 'gwei');
-
-      // maxFeePerGas = max(2x baseFee, baseFee + priorityFee + buffer)
-      // This ensures we always have enough for priority fee
-      const twoXBaseFee = baseFee.mul(2);
-      const basePlusPriority = baseFee.add(maxPriorityFeePerGas).mul(12).div(10); // 1.2x buffer
-      const maxFeePerGas = twoXBaseFee.gt(basePlusPriority) ? twoXBaseFee : basePlusPriority;
-
-      console.log('[Claim] Balance:', ethers.utils.formatEther(balance), 'TON');
-      console.log('[Claim] BaseFee:', ethers.utils.formatUnits(baseFee, 'gwei'), 'gwei');
-      console.log('[Claim] PriorityFee:', ethers.utils.formatUnits(maxPriorityFeePerGas, 'gwei'), 'gwei');
-      console.log('[Claim] MaxFeePerGas:', ethers.utils.formatUnits(maxFeePerGas, 'gwei'), 'gwei');
-
-      // 3. Gas limit is always 21000 for simple EOA-to-EOA ETH transfer
-      const gasLimit = ethers.BigNumber.from(21000);
-
-      // 4. Calculate maximum possible gas cost (using BigInt math, no floats)
-      const maxGasCost = gasLimit.mul(maxFeePerGas);
-
-      // 5. Calculate send amount: balance - maxGasCost
-      const sendAmount = balance.sub(maxGasCost);
-
-      console.log('[Claim] MaxGasCost:', ethers.utils.formatEther(maxGasCost), 'TON');
-      console.log('[Claim] SendAmount:', ethers.utils.formatEther(sendAmount), 'TON');
-
-      // 6. Validate we have enough to send
-      if (sendAmount.lte(0)) {
-        const minRequired = ethers.utils.formatEther(maxGasCost);
-        throw new Error(`Balance too low for gas. Need at least ${parseFloat(minRequired).toFixed(6)} TON.`);
-      }
-
-      // 7. Send transaction with explicit EIP-1559 params
-      const tx = await wallet.sendTransaction({
-        to: recipient,
-        value: sendAmount,
-        gasLimit,
-        maxFeePerGas,
-        maxPriorityFeePerGas,
-        type: 2, // Explicitly set EIP-1559 transaction type
-      });
-      const receipt = await tx.wait();
-
-      setPayments(prev => prev.map(p =>
-        p.announcement.txHash === payment.announcement.txHash ? { ...p, claimed: true, balance: '0' } : p
-      ));
-
-      return receipt.transactionHash;
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Claim failed';
-      setError(msg);
-      return null;
     }
+
+    const msg = lastError?.message || 'Claim failed';
+    setError(msg);
+    return null;
   }, []);
 
   return { payments, scan, scanInBackground, stopBackgroundScan, claimPayment, isScanning, lastScannedBlock, progress, error };
