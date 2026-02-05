@@ -42,14 +42,12 @@ export function useStealthName() {
       return;
     }
 
-    const provider = getProvider();
-    if (!provider) return;
-
+    // No wallet provider needed - uses direct Thanos RPC for read-only calls
     setIsLoading(true);
     setError(null);
 
     try {
-      const names = await getNamesOwnedBy(provider, address);
+      const names = await getNamesOwnedBy(null as unknown as ethers.providers.Provider, address);
       setOwnedNames(names.map(name => ({ name, fullName: formatNameWithSuffix(name) })));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load names');
@@ -120,13 +118,9 @@ export function useStealthName() {
       console.warn('[useStealthName] Name registry not configured');
       return null;
     }
-    const provider = getProvider();
-    if (!provider) {
-      console.warn('[useStealthName] No provider available');
-      return null;
-    }
+    // No wallet provider needed - uses direct Thanos RPC for read-only calls
     try {
-      return await isNameAvailable(provider, name);
+      return await isNameAvailable(null as unknown as ethers.providers.Provider, name);
     } catch (e) {
       console.error('[useStealthName] checkAvailability error:', e);
       return null;
@@ -135,10 +129,9 @@ export function useStealthName() {
 
   const resolveName = useCallback(async (name: string): Promise<string | null> => {
     if (!isConfigured) return null;
-    const provider = getProvider();
-    if (!provider) return null;
+    // No wallet provider needed - uses direct Thanos RPC for read-only calls
     try {
-      return await resolveStealthName(provider, name);
+      return await resolveStealthName(null as unknown as ethers.providers.Provider, name);
     } catch {
       return null;
     }
