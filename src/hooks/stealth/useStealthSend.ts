@@ -22,31 +22,53 @@ function getThanosProvider() {
   return new ethers.providers.JsonRpcProvider(THANOS_RPC);
 }
 
-// Estimate total gas cost for send + announce
-async function estimateTotalGasCost(provider: ethers.providers.Provider): Promise<ethers.BigNumber> {
+// Estimate gas cost for ETH transfer only (21k gas)
+async function estimateEthTransferGasCost(provider: ethers.providers.Provider): Promise<ethers.BigNumber> {
   const feeData = await provider.getFeeData();
   const block = await provider.getBlock('latest');
 
   const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
-  const priorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1', 'gwei');
+  const priorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei');
 
   // maxFeePerGas = max(2x baseFee, 1.2x (baseFee + priorityFee))
   const twoXBaseFee = baseFee.mul(2);
   const basePlusPriority = baseFee.add(priorityFee).mul(12).div(10);
   const maxFeePerGas = twoXBaseFee.gt(basePlusPriority) ? twoXBaseFee : basePlusPriority;
 
-  // Gas for ETH transfer (21000) + announce (~100000) with buffer
-  const totalGas = ethers.BigNumber.from(21000 + 120000);
-  return totalGas.mul(maxFeePerGas);
+  // Gas for ETH transfer only + 5% buffer for RPC timing differences
+  const gasLimit = ethers.BigNumber.from(21000);
+  const baseCost = gasLimit.mul(maxFeePerGas);
+  const buffer = baseCost.mul(5).div(100);
+  return baseCost.add(buffer);
 }
 
-// Calculate maximum sendable amount (balance - gas costs)
+// Estimate gas cost for announce transaction (~100k gas)
+async function estimateAnnounceGasCost(provider: ethers.providers.Provider): Promise<ethers.BigNumber> {
+  const feeData = await provider.getFeeData();
+  const block = await provider.getBlock('latest');
+
+  const baseFee = block.baseFeePerGas || feeData.gasPrice || ethers.utils.parseUnits('1', 'gwei');
+  const priorityFee = feeData.maxPriorityFeePerGas || ethers.utils.parseUnits('1.5', 'gwei');
+
+  const twoXBaseFee = baseFee.mul(2);
+  const basePlusPriority = baseFee.add(priorityFee).mul(12).div(10);
+  const maxFeePerGas = twoXBaseFee.gt(basePlusPriority) ? twoXBaseFee : basePlusPriority;
+
+  // Announce uses ~80-100k gas, use 120k to be safe
+  const gasLimit = ethers.BigNumber.from(120000);
+  return gasLimit.mul(maxFeePerGas);
+}
+
+// Calculate maximum sendable amount (balance - gas costs for both send + announce)
 async function calculateMaxSendable(
   provider: ethers.providers.Provider,
   address: string
 ): Promise<{ maxAmount: ethers.BigNumber; gasCost: ethers.BigNumber; balance: ethers.BigNumber }> {
   const balance = await provider.getBalance(address);
-  const gasCost = await estimateTotalGasCost(provider);
+  // Need gas for both ETH transfer AND announce transaction
+  const ethGas = await estimateEthTransferGasCost(provider);
+  const announceGas = await estimateAnnounceGasCost(provider);
+  const gasCost = ethGas.add(announceGas);
   const maxAmount = balance.sub(gasCost);
   return { maxAmount: maxAmount.gt(0) ? maxAmount : ethers.BigNumber.from(0), gasCost, balance };
 }
@@ -261,10 +283,12 @@ export function useStealthSend() {
       const signer = provider.getSigner();
       const signerAddress = await signer.getAddress();
 
-      // Check ETH balance for gas first
+      // Check ETH balance for gas first (need gas for token transfer + announce)
       const thanosProvider = getThanosProvider();
       const ethBalance = await thanosProvider.getBalance(signerAddress);
-      const gasCost = await estimateTotalGasCost(thanosProvider);
+      const tokenTransferGas = await estimateAnnounceGasCost(thanosProvider); // Token transfer ~= announce gas
+      const announceGas = await estimateAnnounceGasCost(thanosProvider);
+      const gasCost = tokenTransferGas.add(announceGas);
 
       if (ethBalance.lt(gasCost)) {
         throw new Error(`Insufficient ETH for gas. Need ~${ethers.utils.formatEther(gasCost)} TON`);
