@@ -18,7 +18,7 @@ import {
   ShieldIcon, LockIcon, SendIcon, InboxIcon, SettingsIcon, HomeIcon,
   CopyIcon, CheckIcon, CheckCircleIcon, AlertCircleIcon, InfoIcon,
   WalletIcon, RefreshIcon, ArrowUpRightIcon, ArrowDownLeftIcon,
-  TagIcon, TrashIcon, KeyIcon, ZapIcon, ServerIcon,
+  TagIcon, TrashIcon, KeyIcon, ZapIcon, ServerIcon, HistoryIcon,
 } from "./icons";
 
 interface ColorTokens {
@@ -74,7 +74,7 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-type ViewType = "home" | "send" | "inbox" | "settings";
+type ViewType = "home" | "send" | "inbox" | "history" | "settings";
 
 export const PrivateWallet = () => {
   const { isConnected, address } = useWalletConnect();
@@ -171,7 +171,11 @@ export const PrivateWallet = () => {
 
     if (useRelayerMode && isRelayerAvailable) {
       const result = await relayerWithdraw(payment.announcement.stealthAddress, payment.stealthPrivateKey, claimTo);
-      if (result?.status === 'completed' && result.txHash) setClaimedTx(result.txHash);
+      if (result?.status === 'completed' && result.txHash) {
+        setClaimedTx(result.txHash);
+        // Refresh payments to update claimed status after relayer claim
+        setTimeout(() => scan(), 1000);
+      }
     } else {
       const txHash = await claimPayment(payment, claimTo);
       if (txHash) setClaimedTx(txHash);
@@ -303,38 +307,60 @@ export const PrivateWallet = () => {
       </Box>
 
       {/* Navigation */}
-      <HStack p="12px 16px" gap="8px" borderBottom={`1px solid ${colors.border.default}`} bgColor={colors.bg.input}>
+      <Flex p="10px 12px" gap="4px" borderBottom={`1px solid ${colors.border.default}`} bgColor={colors.bg.input} justify="space-between">
         {([
           { id: "home", label: "Home", Icon: HomeIcon },
           { id: "send", label: "Send", Icon: SendIcon },
           { id: "inbox", label: "Inbox", Icon: InboxIcon },
-          { id: "settings", label: "Settings", Icon: SettingsIcon },
+          { id: "history", label: "History", Icon: HistoryIcon },
+          { id: "settings", label: "", Icon: SettingsIcon },
         ] as const).map((item) => (
-          <Button key={item.id} flex={1} h="42px"
-            bgColor={view === item.id ? colors.bg.elevated : "transparent"} borderRadius={radius.sm}
+          <Button
+            key={item.id}
+            h="36px"
+            px={item.label ? "12px" : "10px"}
+            minW={item.label ? "auto" : "36px"}
+            bgColor={view === item.id ? colors.bg.elevated : "transparent"}
+            borderRadius={radius.xs}
             border={view === item.id ? `1.5px solid ${colors.accent.indigo}` : "1.5px solid transparent"}
-            fontWeight={view === item.id ? 600 : 500} fontSize="13px"
+            fontWeight={view === item.id ? 600 : 500}
+            fontSize="12px"
             color={view === item.id ? colors.text.primary : colors.text.tertiary}
             _hover={{ bgColor: colors.bg.elevated, color: colors.text.primary }}
-            onClick={() => setView(item.id)}>
-            <HStack gap="8px">
-              <item.Icon size={18} color={view === item.id ? colors.accent.indigo : colors.text.tertiary} />
-              <Text>{item.label}</Text>
-              {item.id === "inbox" && pendingPayments.length > 0 && (
-                <Box minW="22px" h="22px" px="6px" borderRadius="11px" bgColor={colors.accent.amber} display="flex" alignItems="center" justifyContent="center">
-                  <Text fontSize="11px" fontWeight={700} color="#000">{pendingPayments.length}</Text>
-                </Box>
-              )}
+            onClick={() => setView(item.id)}
+            position="relative"
+          >
+            <HStack gap="6px">
+              <item.Icon size={16} color={view === item.id ? colors.accent.indigo : colors.text.tertiary} />
+              {item.label && <Text>{item.label}</Text>}
             </HStack>
+            {item.id === "inbox" && pendingPayments.length > 0 && (
+              <Box
+                position="absolute"
+                top="-4px"
+                right="-4px"
+                minW="18px"
+                h="18px"
+                px="5px"
+                borderRadius="9px"
+                bgColor={colors.accent.amber}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text fontSize="10px" fontWeight={700} color="#000">{pendingPayments.length}</Text>
+              </Box>
+            )}
           </Button>
         ))}
-      </HStack>
+      </Flex>
 
       {/* Content */}
       <Box p="20px">
         {view === "home" && <HomeView {...{ colors, radius, fadeIn, ownedNames, nameRegistryConfigured, nameInput, setNameInput, isCheckingName, isNameAvailable, formatName, validateName, handleRegisterName, isNameLoading, handleCopy, setView, scan, isRegistered, registerMetaAddress, isKeyLoading }} />}
         {view === "send" && <SendView {...{ colors, radius, fadeIn, sendStep, recipient, setRecipient, amount, setAmount, isResolving, resolvedAddress, handleSendPreview, handleSend, setSendStep, lastGeneratedAddress, isSendLoading, sendTxHash, resetSendFlow, sendError }} />}
         {view === "inbox" && <InboxView {...{ colors, radius, fadeIn, payments, isScanning, scan, claimAddressesInitialized, claimAddresses, selectedIndex: selectedClaimIndex, selectAddress: selectClaimAddress, handleClaim, claimingIndex, claimedTx, scanError, useRelayerMode, setUseRelayerMode, isRelayerAvailable, isCheckingRelayer, relayerInfo, refreshRelayerInfo, relayerError, isRelayerWithdrawing }} />}
+        {view === "history" && <HistoryView {...{ colors, radius, fadeIn, payments }} />}
         {view === "settings" && <SettingsView {...{ colors, radius, fadeIn, metaAddress, handleCopy, copied, claimAddressesInitialized, claimAddresses, clearKeys }} />}
       </Box>
     </Box>
@@ -419,6 +445,13 @@ interface SettingsViewProps {
   claimAddressesInitialized: boolean;
   claimAddresses: ClaimAddress[];
   clearKeys: () => void;
+}
+
+interface HistoryViewProps {
+  colors: ColorTokens;
+  radius: RadiusTokens;
+  fadeIn: Keyframes;
+  payments: StealthPayment[];
 }
 
 // Sub-components
@@ -590,7 +623,19 @@ const SendView = ({ colors, radius, fadeIn, sendStep, recipient, setRecipient, a
           <Text fontSize="18px" fontWeight={600} color={colors.text.primary}>Payment Sent</Text>
           <Text fontSize="13px" color={colors.text.muted} textAlign="center">{amount} TON sent privately to {recipient.includes(".tok") ? recipient : "recipient"}</Text>
         </VStack>
-        {sendTxHash && <Text fontSize="11px" color={colors.text.muted} fontFamily="'JetBrains Mono', monospace">tx: {sendTxHash.slice(0, 18)}...{sendTxHash.slice(-8)}</Text>}
+        {sendTxHash && (
+          <VStack gap="10px" w="100%" maxW="360px">
+            <Box p="10px 12px" bgColor={colors.bg.input} borderRadius={radius.xs} border={`1px solid ${colors.border.default}`} w="100%">
+              <Text fontSize="11px" color={colors.text.secondary} fontFamily="'JetBrains Mono', monospace" wordBreak="break-all" lineHeight="1.5">{sendTxHash}</Text>
+            </Box>
+            <a href={`https://explorer.thanos-sepolia.tokamak.network/tx/${sendTxHash}`} target="_blank" rel="noopener noreferrer">
+              <HStack gap="6px" px="12px" py="6px" bgColor={colors.bg.elevated} borderRadius={radius.xs} border={`1px solid ${colors.border.light}`} _hover={{ bgColor: colors.bg.hover, borderColor: colors.accent.indigo }}>
+                <ArrowUpRightIcon size={13} color={colors.accent.indigo} />
+                <Text fontSize="12px" color={colors.accent.indigo} fontWeight={500}>View on Explorer</Text>
+              </HStack>
+            </a>
+          </VStack>
+        )}
         <Button h="44px" px="28px" bgColor={colors.accent.indigoDark} borderRadius={radius.sm} fontWeight={500} fontSize="13px" color="#fff"
           _hover={{ bgColor: colors.accent.indigo }} onClick={resetSendFlow}>Send Another</Button>
       </VStack>
@@ -604,149 +649,425 @@ const SendView = ({ colors, radius, fadeIn, sendStep, recipient, setRecipient, a
   </VStack>
 );
 
-const InboxView = ({ colors, radius, fadeIn, payments, isScanning, scan, claimAddressesInitialized, claimAddresses, selectedIndex, selectAddress, handleClaim, claimingIndex, claimedTx, scanError, useRelayerMode, setUseRelayerMode, isRelayerAvailable, isCheckingRelayer, relayerInfo, refreshRelayerInfo, relayerError, isRelayerWithdrawing }: InboxViewProps) => (
-  <VStack gap="20px" align="stretch" animation={`${fadeIn} 0.25s ease-out`}>
-    <HStack justify="space-between" align="center">
-      <VStack gap="4px" align="flex-start">
-        <Text fontSize="18px" fontWeight={600} color={colors.text.primary}>Inbox</Text>
-        <Text fontSize="14px" color={colors.text.muted}>Private payments sent to you</Text>
-      </VStack>
-      <Button h="36px" px="14px" bgColor={colors.accent.indigoDark} borderRadius={radius.xs} fontWeight={500} fontSize="12px" color="#fff"
-        _hover={{ bgColor: colors.accent.indigo }} onClick={() => scan()} disabled={isScanning}>
-        {isScanning ? <HStack gap="6px"><Spinner size="xs" /><Text>Scanning...</Text></HStack> : <HStack gap="6px"><RefreshIcon size={13} /><Text>Refresh</Text></HStack>}
-      </Button>
-    </HStack>
+const InboxView = ({ colors, radius, fadeIn, payments, isScanning, scan, claimAddressesInitialized, claimAddresses, selectedIndex, selectAddress, handleClaim, claimingIndex, claimedTx, scanError, useRelayerMode, setUseRelayerMode, isRelayerAvailable, isCheckingRelayer, relayerInfo, refreshRelayerInfo, relayerError, isRelayerWithdrawing }: InboxViewProps) => {
+  const isPrivateMode = useRelayerMode && isRelayerAvailable;
+  const accentColor = isPrivateMode ? colors.accent.indigo : colors.accent.green;
+  const accentBright = isPrivateMode ? colors.accent.indigoBright : colors.accent.greenBright;
+  const accentDark = isPrivateMode ? colors.accent.indigoDark : colors.accent.greenDark;
+  const glowColor = isPrivateMode ? colors.glow.indigo : colors.glow.green;
 
-    {claimAddressesInitialized && claimAddresses.length > 0 && (
-      <Box p="16px" bgColor={colors.bg.input} borderRadius={radius.md} border={`1px solid ${colors.border.default}`}>
-        <Text fontSize="12px" color={colors.text.muted} mb="10px" fontWeight={500}>Claim to:</Text>
+  return (
+    <VStack gap="16px" align="stretch" animation={`${fadeIn} 0.25s ease-out`}>
+      {/* Header with Mode Toggle */}
+      <Flex justify="space-between" align="center" pb="12px" borderBottom={`1px solid ${colors.border.default}`}>
+        <VStack gap="2px" align="flex-start">
+          <Text fontSize="18px" fontWeight={600} color={colors.text.primary}>Inbox</Text>
+          <Text fontSize="12px" color={colors.text.muted}>
+            {isPrivateMode ? "Private mode enabled" : "Receiving payments"}
+          </Text>
+        </VStack>
+        <HStack gap="10px">
+          {/* Mode Toggle */}
+          <HStack
+            gap="0"
+            p="3px"
+            bgColor={colors.bg.input}
+            borderRadius={radius.sm}
+            border={`1px solid ${colors.border.default}`}
+          >
+            <Button
+              h="32px" px="14px"
+              bgColor={!useRelayerMode ? colors.accent.green : "transparent"}
+              borderRadius={radius.xs}
+              fontWeight={500} fontSize="12px"
+              color={!useRelayerMode ? colors.bg.page : colors.text.muted}
+              _hover={{ bgColor: !useRelayerMode ? colors.accent.green : colors.bg.hover }}
+              onClick={() => setUseRelayerMode(false)}
+            >
+              <Text>Normal</Text>
+            </Button>
+            <Button
+              h="32px" px="14px"
+              bgColor={useRelayerMode ? colors.accent.indigo : "transparent"}
+              borderRadius={radius.xs}
+              fontWeight={500} fontSize="12px"
+              color={useRelayerMode ? "#fff" : colors.text.muted}
+              _hover={{ bgColor: useRelayerMode ? colors.accent.indigo : colors.bg.hover }}
+              onClick={() => isRelayerAvailable ? setUseRelayerMode(true) : refreshRelayerInfo()}
+              disabled={isCheckingRelayer}
+            >
+              <HStack gap="5px">
+                <ZapIcon size={12} color={useRelayerMode ? "#fff" : colors.text.muted} />
+                <Text>Private</Text>
+              </HStack>
+            </Button>
+          </HStack>
+          {/* Scan Button */}
+          <Button
+            h="38px" px="14px"
+            bgColor={colors.bg.elevated}
+            borderRadius={radius.xs}
+            border={`1px solid ${colors.border.light}`}
+            fontWeight={500} fontSize="12px"
+            color={colors.text.secondary}
+            _hover={{ bgColor: colors.bg.hover, borderColor: accentColor }}
+            onClick={() => scan()}
+            disabled={isScanning}
+          >
+            {isScanning ? <Spinner size="xs" /> : <RefreshIcon size={14} />}
+          </Button>
+        </HStack>
+      </Flex>
+
+      {/* Private Mode Info Banner */}
+      {isPrivateMode && (
+        <Box
+          p="14px 16px"
+          bgGradient="linear(135deg, rgba(124, 127, 255, 0.12) 0%, rgba(124, 127, 255, 0.04) 100%)"
+          borderRadius={radius.md}
+          border="1px solid rgba(124, 127, 255, 0.3)"
+        >
+          <HStack justify="space-between" align="center">
+            <HStack gap="12px">
+              <Box p="8px" bgColor="rgba(124, 127, 255, 0.2)" borderRadius={radius.xs}>
+                <ShieldIcon size={16} color={colors.accent.indigoBright} />
+              </Box>
+              <VStack align="flex-start" gap="1px">
+                <Text fontSize="13px" fontWeight={600} color={colors.text.primary}>Privacy Protected</Text>
+                <Text fontSize="11px" color={colors.text.muted}>
+                  Relayer hides your wallet • {relayerInfo?.feeBps ? relayerInfo.feeBps / 100 : 0.5}% fee
+                </Text>
+              </VStack>
+            </HStack>
+            <Box px="8px" py="3px" bgColor="rgba(0, 214, 143, 0.15)" borderRadius="4px">
+              <Text fontSize="10px" color={colors.accent.green} fontWeight={600}>Online</Text>
+            </Box>
+          </HStack>
+        </Box>
+      )}
+
+      {/* Relayer Offline Warning */}
+      {useRelayerMode && !isRelayerAvailable && !isCheckingRelayer && (
+        <Box p="14px 16px" bgColor="rgba(255, 107, 107, 0.08)" borderRadius={radius.md} border="1px solid rgba(255, 107, 107, 0.2)">
+          <HStack justify="space-between" align="center">
+            <HStack gap="10px">
+              <AlertCircleIcon size={16} color={colors.accent.red} />
+              <Text fontSize="13px" color={colors.accent.red}>Relayer offline - using normal mode</Text>
+            </HStack>
+            <Button h="28px" px="12px" bgColor="rgba(255, 107, 107, 0.15)" borderRadius={radius.xs}
+              fontSize="11px" fontWeight={500} color={colors.accent.red}
+              _hover={{ bgColor: "rgba(255, 107, 107, 0.25)" }}
+              onClick={refreshRelayerInfo}>
+              Retry
+            </Button>
+          </HStack>
+        </Box>
+      )}
+
+      {relayerError && (
+        <Box p="12px 14px" bgColor="rgba(255, 107, 107, 0.08)" borderRadius={radius.xs}>
+          <HStack gap="8px">
+            <AlertCircleIcon size={14} color={colors.accent.red} />
+            <Text fontSize="12px" color={colors.accent.red}>{relayerError}</Text>
+          </HStack>
+        </Box>
+      )}
+
+      {/* Claim Address Selector */}
+      {claimAddressesInitialized && claimAddresses.length > 0 && (
         <HStack gap="8px" flexWrap="wrap">
+          <Text fontSize="11px" color={colors.text.muted} fontWeight={500}>Claim to:</Text>
           {claimAddresses.slice(0, 3).map((addr: ClaimAddress, idx: number) => (
-            <Button key={addr.address} h="34px" px="14px" bgColor={selectedIndex === idx ? colors.accent.indigo : colors.bg.page}
-              borderRadius={radius.xs} border={`1px solid ${selectedIndex === idx ? colors.accent.indigo : colors.border.default}`}
-              fontSize="13px" fontWeight={500} color={selectedIndex === idx ? colors.text.primary : colors.text.tertiary}
-              _hover={{ bgColor: selectedIndex === idx ? colors.accent.indigo : colors.bg.hover }} onClick={() => selectAddress(idx)}>
+            <Button
+              key={addr.address}
+              h="28px" px="12px"
+              bgColor={selectedIndex === idx ? accentColor : "transparent"}
+              borderRadius={radius.xs}
+              border={`1px solid ${selectedIndex === idx ? accentColor : colors.border.default}`}
+              fontSize="11px" fontWeight={500}
+              color={selectedIndex === idx ? (isPrivateMode ? "#fff" : colors.bg.page) : colors.text.muted}
+              _hover={{ borderColor: accentColor }}
+              onClick={() => selectAddress(idx)}
+            >
               {addr.label || `Wallet ${idx + 1}`}
             </Button>
           ))}
         </HStack>
-      </Box>
-    )}
+      )}
 
-    <Box p="16px" bgColor={colors.bg.input} borderRadius={radius.md} border={`1px solid ${useRelayerMode && isRelayerAvailable ? colors.accent.indigo : colors.border.default}`}>
-      <HStack justify="space-between" align="center">
-        <HStack gap="12px">
-          <Box p="8px" bgColor={useRelayerMode && isRelayerAvailable ? "rgba(124, 127, 255, 0.15)" : colors.bg.elevated} borderRadius={radius.xs}>
-            <ZapIcon size={18} color={useRelayerMode && isRelayerAvailable ? colors.accent.indigoBright : colors.text.muted} />
-          </Box>
-          <VStack align="flex-start" gap="2px">
-            <HStack gap="8px">
-              <Text fontSize="14px" fontWeight={500} color={colors.text.primary}>Private Claim</Text>
-              {isCheckingRelayer && <Spinner size="xs" color={colors.text.muted} />}
-              {!isCheckingRelayer && !isRelayerAvailable && <Box px="6px" py="2px" bgColor="rgba(255, 107, 107, 0.1)" borderRadius="4px"><Text fontSize="10px" color={colors.accent.red} fontWeight={600}>Offline</Text></Box>}
-              {!isCheckingRelayer && isRelayerAvailable && <Box px="6px" py="2px" bgColor="rgba(0, 214, 143, 0.1)" borderRadius="4px"><Text fontSize="10px" color={colors.accent.green} fontWeight={600}>Online</Text></Box>}
+      {/* Success State */}
+      {claimedTx && (
+        <Box
+          p="20px"
+          bgGradient={isPrivateMode
+            ? "linear(135deg, rgba(124, 127, 255, 0.1) 0%, rgba(124, 127, 255, 0.02) 100%)"
+            : "linear(135deg, rgba(0, 214, 143, 0.1) 0%, rgba(0, 214, 143, 0.02) 100%)"}
+          borderRadius={radius.lg}
+          border={`1px solid ${isPrivateMode ? "rgba(124, 127, 255, 0.3)" : "rgba(0, 214, 143, 0.3)"}`}
+        >
+          <VStack gap="16px" align="stretch">
+            <HStack gap="12px">
+              <Box p="10px" bgColor={isPrivateMode ? "rgba(124, 127, 255, 0.15)" : "rgba(0, 214, 143, 0.15)"} borderRadius="50%">
+                {isPrivateMode ? <ZapIcon size={20} color={accentBright} /> : <CheckCircleIcon size={20} color={accentBright} />}
+              </Box>
+              <VStack align="flex-start" gap="2px">
+                <Text fontSize="15px" fontWeight={600} color={colors.text.primary}>
+                  {isPrivateMode ? "Privately Claimed!" : "Payment Claimed!"}
+                </Text>
+                <Text fontSize="12px" color={colors.text.muted}>
+                  {isPrivateMode ? "Your identity was hidden from the blockchain" : "Funds sent to your wallet"}
+                </Text>
+              </VStack>
             </HStack>
-            <Text fontSize="12px" color={colors.text.muted}>{useRelayerMode && isRelayerAvailable ? `Relayer hides your identity (${relayerInfo?.feeBps ? relayerInfo.feeBps / 100 : 0.5}% fee)` : "Use relayer to hide sender identity"}</Text>
+
+            <Box p="12px 14px" bgColor="rgba(0, 0, 0, 0.25)" borderRadius={radius.sm}>
+              <Text fontSize="10px" color={colors.text.muted} mb="6px" fontWeight={500}>Transaction Hash</Text>
+              <Text fontSize="11px" color={accentBright} fontFamily="'JetBrains Mono', monospace" wordBreak="break-all" lineHeight="1.6">
+                {claimedTx}
+              </Text>
+            </Box>
+
+            <a href={`https://explorer.thanos-sepolia.tokamak.network/tx/${claimedTx}`} target="_blank" rel="noopener noreferrer">
+              <Button
+                w="100%" h="40px"
+                bgColor={isPrivateMode ? "rgba(124, 127, 255, 0.15)" : "rgba(0, 214, 143, 0.15)"}
+                borderRadius={radius.sm}
+                border={`1px solid ${isPrivateMode ? "rgba(124, 127, 255, 0.3)" : "rgba(0, 214, 143, 0.3)"}`}
+                fontWeight={500} fontSize="13px"
+                color={accentBright}
+                _hover={{ bgColor: isPrivateMode ? "rgba(124, 127, 255, 0.25)" : "rgba(0, 214, 143, 0.25)" }}
+              >
+                <HStack gap="8px">
+                  <ArrowUpRightIcon size={14} color={accentBright} />
+                  <Text>View on Explorer</Text>
+                </HStack>
+              </Button>
+            </a>
           </VStack>
-        </HStack>
-        <Button h="34px" px="14px" bgColor={useRelayerMode ? colors.accent.indigo : colors.bg.elevated} borderRadius={radius.xs}
-          border={`1px solid ${useRelayerMode ? colors.accent.indigo : colors.border.light}`} fontWeight={500} fontSize="12px"
-          color={useRelayerMode ? "#fff" : colors.text.secondary} _hover={{ bgColor: useRelayerMode ? colors.accent.indigoDark : colors.bg.hover }}
-          onClick={() => isRelayerAvailable ? setUseRelayerMode(!useRelayerMode) : refreshRelayerInfo()} disabled={isCheckingRelayer}>
-          {isCheckingRelayer ? "Checking..." : useRelayerMode ? "Enabled" : isRelayerAvailable ? "Enable" : "Retry"}
-        </Button>
-      </HStack>
-      {useRelayerMode && isRelayerAvailable && relayerInfo && (
-        <Box mt="12px" p="10px 12px" bgColor={colors.bg.page} borderRadius={radius.xs} border={`1px solid ${colors.border.default}`}>
-          <HStack gap="16px" fontSize="11px" color={colors.text.muted}>
-            <HStack gap="4px"><ServerIcon size={12} /><Text>Relayer: {relayerInfo.relayerAddress.slice(0, 8)}...</Text></HStack>
-            <Text>Fee: {relayerInfo.feeBps / 100}%</Text>
+        </Box>
+      )}
+
+      {/* Payments List - Only show unclaimed payments */}
+      {(() => {
+        const pendingList = payments.filter(p => !p.claimed);
+        return pendingList.length === 0 ? (
+          <Box
+            p="48px 24px"
+            bgColor={colors.bg.input}
+            borderRadius={radius.lg}
+            border={`1px solid ${colors.border.default}`}
+            textAlign="center"
+          >
+            <VStack gap="14px">
+              <Box p="16px" bgColor={colors.bg.elevated} borderRadius="50%">
+                <InboxIcon size={32} color={colors.text.muted} />
+              </Box>
+              <VStack gap="6px">
+                <Text fontSize="15px" fontWeight={500} color={colors.text.primary}>No pending payments</Text>
+                <Text fontSize="13px" color={colors.text.muted} maxW="240px" lineHeight="1.5">
+                  When someone sends you a private payment, it will appear here
+                </Text>
+              </VStack>
+            </VStack>
+          </Box>
+        ) : (
+          <VStack gap="10px" align="stretch">
+            {pendingList.map((payment: StealthPayment) => {
+              const index = payments.indexOf(payment);
+              const balance = parseFloat(payment.balance || "0");
+            const isTooLowForGas = balance > 0 && balance < MIN_CLAIMABLE_BALANCE;
+            const canClaim = !payment.claimed && !payment.keyMismatch && !isTooLowForGas;
+
+            return (
+              <Box
+                key={payment.announcement.txHash}
+                p="18px"
+                bgColor={colors.bg.input}
+                borderRadius={radius.md}
+                border={`1px solid ${canClaim ? (isPrivateMode ? "rgba(124, 127, 255, 0.3)" : "rgba(0, 214, 143, 0.3)") : colors.border.default}`}
+                opacity={payment.claimed || isTooLowForGas ? 0.5 : 1}
+                transition="all 0.2s ease"
+                _hover={canClaim ? { borderColor: accentColor, boxShadow: glowColor } : {}}
+              >
+                <HStack justify="space-between" align="center">
+                  <HStack gap="14px">
+                    <Box
+                      p="10px"
+                      bgColor={payment.claimed ? "rgba(0, 214, 143, 0.1)" : canClaim ? (isPrivateMode ? "rgba(124, 127, 255, 0.1)" : "rgba(0, 214, 143, 0.1)") : colors.bg.elevated}
+                      borderRadius={radius.sm}
+                    >
+                      {payment.claimed ? (
+                        <CheckCircleIcon size={18} color={colors.accent.green} />
+                      ) : canClaim ? (
+                        isPrivateMode ? <ZapIcon size={18} color={colors.accent.indigo} /> : <ArrowDownLeftIcon size={18} color={colors.accent.green} />
+                      ) : (
+                        <AlertCircleIcon size={18} color={colors.text.muted} />
+                      )}
+                    </Box>
+                    <VStack align="flex-start" gap="2px">
+                      <Text fontSize="18px" fontWeight={600} color={colors.text.primary} fontFamily="'JetBrains Mono', monospace">
+                        {balance.toFixed(4)} TON
+                      </Text>
+                      <Text fontSize="11px" color={colors.text.muted}>
+                        Block #{payment.announcement.blockNumber.toLocaleString()}
+                      </Text>
+                    </VStack>
+                  </HStack>
+
+                  {payment.claimed ? (
+                    <HStack gap="6px" px="12px" py="6px" bgColor="rgba(0, 214, 143, 0.1)" borderRadius={radius.xs}>
+                      <CheckCircleIcon size={12} color={colors.accent.green} />
+                      <Text fontSize="12px" fontWeight={500} color={colors.accent.green}>Claimed</Text>
+                    </HStack>
+                  ) : payment.keyMismatch ? (
+                    <HStack gap="6px" px="12px" py="6px" bgColor="rgba(255, 107, 107, 0.1)" borderRadius={radius.xs}>
+                      <AlertCircleIcon size={12} color={colors.accent.red} />
+                      <Text fontSize="12px" fontWeight={500} color={colors.accent.red}>Key Mismatch</Text>
+                    </HStack>
+                  ) : isTooLowForGas ? (
+                    <HStack gap="6px" px="12px" py="6px" bgColor="rgba(255, 190, 11, 0.1)" borderRadius={radius.xs}>
+                      <Text fontSize="12px" fontWeight={500} color={colors.accent.amber}>Dust</Text>
+                    </HStack>
+                  ) : (
+                    <Button
+                      h="38px" px="20px"
+                      bgColor={accentColor}
+                      borderRadius={radius.sm}
+                      fontWeight={500} fontSize="13px"
+                      color={isPrivateMode ? "#fff" : colors.bg.page}
+                      _hover={{ bgColor: accentDark }}
+                      onClick={() => handleClaim(index)}
+                      disabled={claimingIndex === index || isRelayerWithdrawing}
+                    >
+                      {claimingIndex === index ? (
+                        <HStack gap="8px">
+                          <Spinner size="sm" />
+                          <Text>{isPrivateMode ? "Relaying..." : "Claiming..."}</Text>
+                        </HStack>
+                      ) : (
+                        <HStack gap="6px">
+                          {isPrivateMode && <ZapIcon size={13} color="#fff" />}
+                          <Text>{isPrivateMode ? "Private Claim" : "Claim"}</Text>
+                        </HStack>
+                      )}
+                    </Button>
+                  )}
+                </HStack>
+
+                {payment.keyMismatch && (
+                  <Text fontSize="11px" color={colors.accent.red} mt="10px" pl="52px">
+                    Your current keys don&apos;t match this payment
+                  </Text>
+                )}
+              </Box>
+            );
+            })}
+          </VStack>
+        );
+      })()}
+
+      {scanError && (
+        <Box p="12px 14px" bgColor="rgba(255, 107, 107, 0.08)" borderRadius={radius.xs}>
+          <HStack gap="8px">
+            <AlertCircleIcon size={14} color={colors.accent.red} />
+            <Text fontSize="12px" color={colors.accent.red}>{scanError}</Text>
           </HStack>
         </Box>
       )}
-      {relayerError && (
-        <Box mt="12px" p="10px 12px" bgColor="rgba(255, 107, 107, 0.08)" borderRadius={radius.xs}>
-          <HStack gap="6px"><AlertCircleIcon size={12} color={colors.accent.red} /><Text fontSize="11px" color={colors.accent.red}>{relayerError}</Text></HStack>
+    </VStack>
+  );
+};
+
+const HistoryView = ({ colors, radius, fadeIn, payments }: HistoryViewProps) => {
+  const claimedPayments = payments.filter(p => p.claimed);
+  const EXPLORER_BASE = "https://explorer.thanos-sepolia.tokamak.network";
+
+  return (
+    <VStack gap="16px" align="stretch" animation={`${fadeIn} 0.25s ease-out`}>
+      <VStack gap="4px" align="flex-start">
+        <Text fontSize="18px" fontWeight={600} color={colors.text.primary}>History</Text>
+        <Text fontSize="13px" color={colors.text.muted}>Your claimed payments</Text>
+      </VStack>
+
+      {claimedPayments.length === 0 ? (
+        <Box
+          p="48px 24px"
+          bgColor={colors.bg.input}
+          borderRadius={radius.lg}
+          border={`1px solid ${colors.border.default}`}
+          textAlign="center"
+        >
+          <VStack gap="14px">
+            <Box p="16px" bgColor={colors.bg.elevated} borderRadius="50%">
+              <HistoryIcon size={32} color={colors.text.muted} />
+            </Box>
+            <VStack gap="6px">
+              <Text fontSize="15px" fontWeight={500} color={colors.text.primary}>No history yet</Text>
+              <Text fontSize="13px" color={colors.text.muted} maxW="240px" lineHeight="1.5">
+                Claimed payments will appear here
+              </Text>
+            </VStack>
+          </VStack>
+        </Box>
+      ) : (
+        <VStack gap="10px" align="stretch">
+          {claimedPayments.map((payment: StealthPayment) => (
+              <Box
+                key={payment.announcement.txHash}
+                p="16px"
+                bgColor={colors.bg.input}
+                borderRadius={radius.md}
+                border={`1px solid ${colors.border.default}`}
+              >
+                <HStack justify="space-between" align="center">
+                  <HStack gap="12px">
+                    <Box p="10px" bgColor="rgba(0, 214, 143, 0.1)" borderRadius={radius.sm}>
+                      <CheckCircleIcon size={18} color={colors.accent.green} />
+                    </Box>
+                    <VStack align="flex-start" gap="2px">
+                      <HStack gap="6px">
+                        <Text fontSize="14px" fontWeight={600} color={colors.accent.green}>Claimed</Text>
+                      </HStack>
+                      <Text fontSize="11px" color={colors.text.muted}>
+                        Block #{payment.announcement.blockNumber.toLocaleString()}
+                      </Text>
+                    </VStack>
+                  </HStack>
+                  <a href={`${EXPLORER_BASE}/tx/${payment.announcement.txHash}`} target="_blank" rel="noopener noreferrer">
+                    <Button
+                      h="32px" px="12px"
+                      bgColor={colors.bg.elevated}
+                      borderRadius={radius.xs}
+                      border={`1px solid ${colors.border.light}`}
+                      fontWeight={500} fontSize="11px"
+                      color={colors.text.secondary}
+                      _hover={{ borderColor: colors.accent.indigo, color: colors.accent.indigo }}
+                    >
+                      <HStack gap="5px">
+                        <ArrowUpRightIcon size={12} />
+                        <Text>Explorer</Text>
+                      </HStack>
+                    </Button>
+                  </a>
+                </HStack>
+              </Box>
+          ))}
+        </VStack>
+      )}
+
+      {claimedPayments.length > 0 && (
+        <Box p="12px 16px" bgColor={colors.bg.input} borderRadius={radius.sm} border={`1px solid ${colors.border.default}`}>
+          <HStack justify="space-between" align="center">
+            <Text fontSize="12px" color={colors.text.muted}>Total payments claimed</Text>
+            <Text fontSize="14px" fontWeight={600} color={colors.accent.green}>
+              {claimedPayments.length}
+            </Text>
+          </HStack>
         </Box>
       )}
-    </Box>
-
-    {payments.length === 0 ? (
-      <Box p="56px 24px" bgColor={colors.bg.input} borderRadius={radius.lg} border={`1px solid ${colors.border.default}`} textAlign="center">
-        <VStack gap="14px">
-          <Box color={colors.text.muted}><InboxIcon size={44} /></Box>
-          <VStack gap="6px">
-            <Text fontSize="16px" fontWeight={500} color={colors.text.primary}>No payments yet</Text>
-            <Text fontSize="14px" color={colors.text.muted} maxW="260px">When someone sends you a private payment, it will appear here</Text>
-          </VStack>
-        </VStack>
-      </Box>
-    ) : (
-      <VStack gap="12px" align="stretch">
-        {payments.map((payment: StealthPayment, index: number) => {
-          const balance = parseFloat(payment.balance || "0");
-          const isTooLowForGas = balance > 0 && balance < MIN_CLAIMABLE_BALANCE;
-
-          return (
-            <Box key={payment.announcement.txHash} p="20px" bgColor={colors.bg.input} borderRadius={radius.lg}
-              border={`1px solid ${payment.claimed ? colors.border.default : payment.keyMismatch || isTooLowForGas ? colors.border.default : colors.accent.greenDark}`}
-              opacity={payment.claimed || isTooLowForGas ? 0.6 : 1}>
-              <HStack justify="space-between" align="flex-start">
-                <VStack align="flex-start" gap="6px">
-                  <Text fontSize="22px" fontWeight={600} color={colors.text.primary} fontFamily="'JetBrains Mono', monospace">{balance.toFixed(4)} TON</Text>
-                  <Text fontSize="12px" color={colors.text.muted}>Block #{payment.announcement.blockNumber.toLocaleString()}</Text>
-                </VStack>
-                {payment.claimed ? (
-                  <Box px="12px" py="6px" bgColor="rgba(74, 222, 128, 0.1)" borderRadius={radius.xs}>
-                    <HStack gap="6px"><CheckCircleIcon size={14} color={colors.accent.green} /><Text fontSize="13px" fontWeight={500} color={colors.accent.green}>Claimed</Text></HStack>
-                  </Box>
-                ) : payment.keyMismatch ? (
-                  <Box px="12px" py="6px" bgColor="rgba(239, 68, 68, 0.1)" borderRadius={radius.xs}>
-                    <HStack gap="6px"><AlertCircleIcon size={14} color={colors.accent.red} /><Text fontSize="13px" fontWeight={500} color={colors.accent.red}>Cannot Claim</Text></HStack>
-                  </Box>
-                ) : isTooLowForGas ? (
-                  <Box px="12px" py="6px" bgColor="rgba(255, 190, 11, 0.1)" borderRadius={radius.xs}>
-                    <HStack gap="6px"><AlertCircleIcon size={14} color={colors.accent.amber} /><Text fontSize="13px" fontWeight={500} color={colors.accent.amber}>Dust</Text></HStack>
-                  </Box>
-                ) : (
-                  <Button h="40px" px="22px" bgColor={useRelayerMode && isRelayerAvailable ? colors.accent.indigo : colors.accent.green}
-                    borderRadius={radius.xs} fontWeight={500} fontSize="14px" color={useRelayerMode && isRelayerAvailable ? "#fff" : colors.bg.page}
-                    _hover={{ bgColor: useRelayerMode && isRelayerAvailable ? colors.accent.indigoDark : colors.accent.greenDark }}
-                    onClick={() => handleClaim(index)} disabled={claimingIndex === index || isRelayerWithdrawing}>
-                    {claimingIndex === index ? <HStack gap="6px"><Spinner size="sm" /><Text>{useRelayerMode ? "Relaying..." : "Claiming..."}</Text></HStack>
-                      : <HStack gap="6px">{useRelayerMode && isRelayerAvailable && <ZapIcon size={14} />}<Text>{useRelayerMode && isRelayerAvailable ? "Private Claim" : "Claim"}</Text></HStack>}
-                  </Button>
-                )}
-              </HStack>
-              {payment.keyMismatch && (
-                <Box mt="14px" p="12px" bgColor="rgba(239, 68, 68, 0.05)" borderRadius={radius.xs}>
-                  <Text fontSize="12px" color="#fca5a5" lineHeight="1.5">Your current keys don&apos;t match this payment.</Text>
-                </Box>
-              )}
-              {isTooLowForGas && !payment.claimed && (
-                <Box mt="14px" p="12px" bgColor="rgba(255, 190, 11, 0.05)" borderRadius={radius.xs}>
-                  <Text fontSize="12px" color={colors.accent.amber} lineHeight="1.5">Balance too low to cover gas fees (~{MIN_CLAIMABLE_BALANCE} TON required).</Text>
-                </Box>
-              )}
-            </Box>
-          );
-        })}
-      </VStack>
-    )}
-
-    {claimedTx && (
-      <Box p="14px 16px" bgColor="rgba(74, 222, 128, 0.1)" borderRadius={radius.xs} border="1px solid rgba(74, 222, 128, 0.2)">
-        <HStack gap="8px"><CheckCircleIcon size={14} color={colors.accent.green} /><Text fontSize="13px" color={colors.accent.green}>Claimed! tx: {claimedTx.slice(0, 18)}...</Text></HStack>
-      </Box>
-    )}
-
-    {scanError && (
-      <HStack gap="8px" p="14px 16px" bgColor="rgba(239, 68, 68, 0.1)" borderRadius={radius.xs}>
-        <AlertCircleIcon size={16} color={colors.accent.red} /><Text fontSize="13px" color={colors.accent.red}>{scanError}</Text>
-      </HStack>
-    )}
-  </VStack>
-);
+    </VStack>
+  );
+};
 
 const SettingsView = ({ colors, radius, fadeIn, metaAddress, handleCopy, copied, claimAddressesInitialized, claimAddresses, clearKeys }: SettingsViewProps) => (
   <VStack gap="20px" align="stretch" animation={`${fadeIn} 0.25s ease-out`}>

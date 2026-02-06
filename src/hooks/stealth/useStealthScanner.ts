@@ -73,8 +73,24 @@ export function useStealthScanner(stealthKeys: StealthKeyPair | null) {
       );
 
       setPayments((prev) => {
-        const existing = new Set(prev.map(p => p.announcement.txHash));
-        return [...prev, ...enriched.filter(p => !existing.has(p.announcement.txHash))];
+        const existingMap = new Map(prev.map(p => [p.announcement.txHash, p]));
+
+        // Update existing payments with fresh balance data
+        enriched.forEach(p => {
+          if (existingMap.has(p.announcement.txHash)) {
+            const existing = existingMap.get(p.announcement.txHash)!;
+            existingMap.set(p.announcement.txHash, {
+              ...existing,
+              balance: p.balance,
+              // Preserve claimed status if already marked, or update from balance check
+              claimed: existing.claimed || p.claimed,
+            });
+          } else {
+            existingMap.set(p.announcement.txHash, p);
+          }
+        });
+
+        return Array.from(existingMap.values());
       });
 
       if (address) {
