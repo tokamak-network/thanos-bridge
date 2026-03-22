@@ -1,11 +1,13 @@
 
 FROM node:22-alpine AS builder
 
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN yarn install
+RUN yarn install --ignore-optional
 
 COPY . .
 
