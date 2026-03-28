@@ -15,7 +15,13 @@ export const getChainById = (chainId: number): Chain => {
 };
 
 export const isHTTPS = (url: string) => {
-  return url.startsWith("https://");
+  if (url.startsWith("https://")) return true;
+  try {
+    const { hostname } = new URL(url);
+    return hostname === "localhost" || hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
 };
 
 export const getRPCUrlFromChainId = (chainId: number) => {
