@@ -13,11 +13,20 @@ import {
   MenuTrigger,
 } from "@/components/ui/menu";
 import { DisconnectIconComponent } from "@/components/icons/Disconnect";
+import { CopyAddressIconComponent } from "@/components/icons/CopyAddress";
 
 export const Account = () => {
   const { address, isConnected, disconnect } = useWalletConnect();
   const [, setIsOpen] = useAtom(walletConnectModalOpenedStatus);
   const [buttonText, setButtonText] = useState("Connect Wallet");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyAddress = async () => {
+    if (!address) return;
+    await navigator.clipboard.writeText(address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleWalletConnect = () => {
     if (!isConnected) setIsOpen(true);
@@ -79,6 +88,25 @@ export const Account = () => {
         bgColor={"#101217"}
         border={"1px solid #25282F"}
       >
+        <MenuItem
+          value="CopyAddress"
+          width={"192px"}
+          height={"40px"}
+          px={"12px"}
+          py={"6px"}
+          bgColor={"transparent"}
+          _hover={{ bgColor: "#1D1F25" }}
+          fontSize={"14px"}
+          fontWeight={500}
+          justifyContent={"flex-start"}
+          color={"#FFFFFF"}
+          cursor={"pointer"}
+          gap={"8px"}
+          onClick={handleCopyAddress}
+        >
+          <CopyAddressIconComponent width={20} height={20} />
+          {copied ? "Copied!" : "Copy Address"}
+        </MenuItem>
         <MenuItem
           value="Disconnect"
           width={"192px"}
