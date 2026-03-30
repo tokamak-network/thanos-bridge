@@ -2,6 +2,8 @@ const thanosSDK = require("@tokamak-network/thanos-sdk");
 import { useEffect, useMemo, useState } from "react";
 import { useWalletConnect } from "../wallet-connect/useWalletConnect";
 import { CrossChainMessenger } from "@tokamak-network/thanos-sdk";
+import type { PaymasterOptions } from "@tokamak-network/thanos-sdk";
+import { wrapWithPaymaster } from "@tokamak-network/thanos-sdk";
 import { getChainLayer } from "@/utils/network";
 import { ChainLayerEnum } from "@/types/network";
 import { l1Provider, l2Provider } from "@/constants/provider";
@@ -10,7 +12,11 @@ import { getEthersSigner } from "@/utils/provider";
 import { config } from "@/config/wagmi.config";
 import { useChainId } from "wagmi";
 
-export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
+export const useThanosSDK = (
+  l1ChainId: number,
+  l2ChainId: number,
+  paymasterOptions?: PaymasterOptions
+) => {
   const { isConnected, chain } = useWalletConnect();
   const chainId = useChainId();
   const [crossChainMessenger, setCrossChainMessenger] =
@@ -43,6 +49,14 @@ export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
           L1UsdcBridge: env("NEXT_PUBLIC_L1_USDC_BRIDGE_ADDRESS"),
           DisputeGameFactory: env("NEXT_PUBLIC_DISPUTE_GAME_FACTORY_ADDRESS"),
         };
+        const rawL2SignerOrProvider =
+          chainLayer === ChainLayerEnum.L2 ? signer : l2Provider;
+
+        const l2SignerOrProvider =
+          paymasterOptions && signer
+            ? wrapWithPaymaster(signer, paymasterOptions)
+            : rawL2SignerOrProvider;
+
         const cm = new thanosSDK.CrossChainMessenger({
           bedrock: true,
           contracts: {
@@ -52,8 +66,7 @@ export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
           l2ChainId: l2ChainId,
           l1SignerOrProvider:
             chainLayer === ChainLayerEnum.L1 ? signer : l1Provider,
-          l2SignerOrProvider:
-            chainLayer === ChainLayerEnum.L2 ? signer : l2Provider,
+          l2SignerOrProvider,
           nativeTokenAddress: env("NEXT_PUBLIC_NATIVE_TOKEN_L1_ADDRESS"),
         });
         setCrossChainMessenger(cm);
@@ -62,7 +75,7 @@ export const useThanosSDK = (l1ChainId: number, l2ChainId: number) => {
       }
     };
     init();
-  }, [isConnected, chainId]);
+  }, [isConnected, chainId, paymasterOptions]);
 
   const estimateGas = useMemo(() => {
     if (!crossChainMessenger) return null;
