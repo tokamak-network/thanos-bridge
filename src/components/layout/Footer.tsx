@@ -11,7 +11,7 @@ export const Footer = () => {
       width={"100%"}
     >
       <Text color={"#76819B"} fontSize={"12px"} lineHeight={"normal"}>
-        Copyright © 2024. All rights reserved.
+        Copyright © 2026. All rights reserved.
       </Text>
     </Flex>
   );
