@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json yarn.lock ./
 
 RUN --mount=type=cache,id=yarn-$TARGETARCH,target=/usr/local/share/.cache/yarn \
-    yarn install --ignore-optional --frozen-lockfile
+    yarn install --ignore-optional --prefer-offline
 
 COPY . .
 
