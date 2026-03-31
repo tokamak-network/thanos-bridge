@@ -5,9 +5,10 @@ RUN apk add --no-cache python3 make g++
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package*.json yarn.lock ./
 
-RUN yarn install --ignore-optional
+RUN --mount=type=cache,id=yarn-$TARGETARCH,target=/usr/local/share/.cache/yarn \
+    yarn install --ignore-optional --frozen-lockfile
 
 COPY . .
 
