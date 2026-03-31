@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    output: 'standalone',
     transpilePackages: ['wagmi', '@wagmi/connectors', '@tanstack/react-query'],
     webpack: (config) => {
         config.resolve.fallback = { fs: false, net: false, tls: false };
