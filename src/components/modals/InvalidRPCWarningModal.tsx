@@ -62,9 +62,9 @@ export const InvalidRPCWarningModalComponent = () => {
         </DialogHeader>
         <DialogBody>
           <Text fontSize={"14px"} fontWeight={"400"} color={"#E5E5E5"}>
-            You can&apos;t automatically switch the chain in this app since the
-            RPC URL is not secure. Please try to add the network in your wallet
-            manually. Read about it more{" "}
+            You can&apos;t automatically switch the chain in this app. Please
+            try to add the network in your wallet manually. Read about it
+            more{" "}
             <u>
               <Link href={INVALID_RPC_GUIDE_URL} target="_blank">
                 here
