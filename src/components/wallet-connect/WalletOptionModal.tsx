@@ -54,15 +54,13 @@ export const WalletOptionModal: React.FC = () => {
         />
         <DialogBody mt={"12px"}>
           <Flex flexDirection={"column"} gap={"16px"}>
-            {connectors
-              .filter((connector) => connector.name === "MetaMask")
-              .map((connector) => (
-                <WalletOption
-                  key={connector.id}
-                  connector={connector}
-                  onClick={() => connect({ connector })}
-                />
-              ))}
+            {connectors.map((connector) => (
+              <WalletOption
+                key={connector.id}
+                connector={connector}
+                onClick={() => connect({ connector })}
+              />
+            ))}
           </Flex>
         </DialogBody>
       </DialogContent>

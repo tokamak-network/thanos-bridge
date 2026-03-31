@@ -1,10 +1,9 @@
-import { createConfig, http, cookieStorage, createStorage } from "wagmi";
-import { metaMask } from "wagmi/connectors";
+import { createConfig, http, cookieStorage, createStorage, injected } from "wagmi";
 import { l1Chain, l2Chain } from "./network";
 
 export const config = createConfig({
   chains: [l1Chain, l2Chain],
-  connectors: [metaMask()],
+  connectors: [injected()],
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,

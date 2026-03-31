@@ -35,12 +35,17 @@ export const WalletOption: React.FC<WalletOptionProps> = (props) => {
       justifyContent={"flex-start"}
     >
       <Flex gap={"12px"} alignItems={"center"}>
-        <Image
-          src={connector.id === "metaMaskSDK" ? MetamaskIcon : ""}
-          alt={connector.name}
-          width={40}
-          height={40}
-        />
+        {connector.icon ? (
+          <img
+            src={connector.icon}
+            alt={connector.name}
+            width={40}
+            height={40}
+            style={{ borderRadius: 8 }}
+          />
+        ) : (
+          <Image src={MetamaskIcon} alt={connector.name} width={40} height={40} />
+        )}
         <Text fontSize={"18px"} fontWeight={"600"} lineHeight={"24px"}>
           {connector.name}
         </Text>
