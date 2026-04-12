@@ -20,18 +20,18 @@ export const BridgeInfoItem: React.FC<BridgeInfoItemProps> = ({
         alignSelf={"stretch"}
         borderRadius={"6px"}
         background={"#1D1F25"}
+        overflow={"auto"}
       >
         <Input
           color={"#FFF"}
           fontSize={"16px"}
           fontWeight={400}
           lineHeight={"normal"}
-          truncate
-          maxWidth={"380px"}
           value={content}
           outline={"none"}
           border={"none"}
           onChange={() => {}}
+          w={"100%"}
         />
       </Flex>
     </Flex>
