@@ -22,6 +22,10 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
+# Optional: Copy .env file if it exists (for local development)
+# For production, pass environment variables via docker run -e flags or container orchestration
+COPY --chown=node:node .env* ./
+
 EXPOSE 3000
 
 ENV PORT=3000
