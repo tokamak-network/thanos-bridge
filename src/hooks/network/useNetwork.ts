@@ -1,7 +1,7 @@
 import { l1Chain, l2Chain } from "@/config/network";
 import { jotaiInvalidRPCWarningModalOpen } from "@/jotai/bridge";
 import { jotaiGlobalLoading } from "@/jotai/loading";
-import { getRPCUrlFromChainId } from "@/utils/network";
+import { getRPCUrlFromChainId, isHTTPS } from "@/utils/network";
 import { useAtom } from "jotai";
 import { useSwitchChain } from "wagmi";
 
@@ -19,7 +19,9 @@ export const useNetwork = () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
     } catch (error) {
       const rpcUrl = getRPCUrlFromChainId(chainId);
-      if (!rpcUrl.startsWith("https://")) {
+      // Show warning modal only for non-HTTPS URLs in production
+      // Localhost and 127.0.0.1 are allowed for local development
+      if (!isHTTPS(rpcUrl)) {
         setInvalidRPCWarningModalOpen(true);
       }
       setGlobalLoading(false);
