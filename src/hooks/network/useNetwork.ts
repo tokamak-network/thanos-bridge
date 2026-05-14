@@ -1,7 +1,7 @@
 import { l1Chain, l2Chain } from "@/config/network";
 import { jotaiInvalidRPCWarningModalOpen } from "@/jotai/bridge";
 import { jotaiGlobalLoading } from "@/jotai/loading";
-import { getRPCUrlFromChainId, isHTTPS } from "@/utils/network";
+import { getRPCUrlFromChainId } from "@/utils/network";
 import { useAtom } from "jotai";
 import { useSwitchChain } from "wagmi";
 
@@ -19,9 +19,10 @@ export const useNetwork = () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
     } catch (error) {
       const rpcUrl = getRPCUrlFromChainId(chainId);
-      // Show warning modal only for non-HTTPS URLs in production
-      // Localhost and 127.0.0.1 are allowed for local development
-      if (!isHTTPS(rpcUrl)) {
+      // MetaMask rejects wallet_addEthereumChain for any non-HTTPS URL, including localhost.
+      // isHTTPS() permits localhost for in-app RPC calls, but MetaMask's programmatic chain
+      // addition enforces HTTPS strictly. Show the manual-add modal for both cases.
+      if (!rpcUrl.startsWith("https://")) {
         setInvalidRPCWarningModalOpen(true);
       }
       setGlobalLoading(false);
