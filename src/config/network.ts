@@ -22,6 +22,8 @@ export const l1Chain: Chain = {
   },
 };
 
+const l2BlockExplorerUrl = env("NEXT_PUBLIC_L2_BLOCK_EXPLORER") || "";
+
 export const l2Chain: Chain = {
   id: Number(env("NEXT_PUBLIC_L2_CHAIN_ID") || "55007"),
   name: env("NEXT_PUBLIC_L2_CHAIN_NAME") || "Titan Sepolia",
@@ -38,10 +40,11 @@ export const l2Chain: Chain = {
       ],
     },
   },
-  blockExplorers: {
-    default: {
-      name: env("NEXT_PUBLIC_L2_BLOCK_EXPLORER") || "Block Explorer",
-      url: env("NEXT_PUBLIC_L2_BLOCK_EXPLORER") || "",
-    },
-  },
+  ...(l2BlockExplorerUrl
+    ? {
+        blockExplorers: {
+          default: { name: "Block Explorer", url: l2BlockExplorerUrl },
+        },
+      }
+    : {}),
 };
